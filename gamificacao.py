@@ -565,7 +565,9 @@ def mostrar_gamificacao(nome, permissao, email):
 
         gamificacao3_aluno = gamificacao3[gamificacao3['Nome do aluno(a)'] == nome_selecionado].reset_index(drop = True)
 
-        gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).mean().reset_index()
+        #gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).mean().reset_index()
+        gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'mean','Pontuação_Presença_Aulas': 'mean','Pontuação_Presença_Simulado': 'mean','Pontuação_Nota_Simulado': 'mean','Pontuação_Duvidas_Monitoria': 'mean'}).reset_index()
+        
         gamificacao3_medias.columns = ['Métrica', 'Média']
 
         pontuacao_aluno = gamificacao3_aluno['Pontuação'][0]
