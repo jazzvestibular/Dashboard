@@ -472,7 +472,7 @@ def mostrar_gamificacao(nome, permissao, email):
 
 
     #engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-    engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataformaada': 'sum'}).reset_index()
+    engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'sum'}).reset_index()
     st.dataframe(engajamento_plataforma2)
     presenca_aulas2 = presenca_aulas.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
     presenca_mentoria2 = presenca_mentoria.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
