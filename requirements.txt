@@ -2,6 +2,7 @@ pandas==2.2.1
 plotly==4.14.3
 streamlit==0.89.0
 openpyxl
+matplotlib==3.4.2
 GitPython==3.1.18
 gspread==4.0.1
 oauth2client==4.1.3
