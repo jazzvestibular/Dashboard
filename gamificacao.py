@@ -495,6 +495,8 @@ def mostrar_gamificacao(nome, permissao, email):
         duvidas_monitoria_aluno2 = duvidas_monitoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
 
         gamificacao1 = pd.merge(presenca_aulas2, engajamento_plataforma2, on = ['Nome do aluno(a)','Turma'], how = 'left')
+        st.dataframe(gamificacao1)
+        st.dataframe(presenca_mentoria2)
         gamificacao2 = pd.merge(gamificacao1, presenca_mentoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao4 = pd.merge(gamificacao2, presenca_nota_simulado2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao_final = pd.merge(gamificacao4, duvidas_monitoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
