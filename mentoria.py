@@ -10,7 +10,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from plotly.subplots import make_subplots
 from PIL import Image
-import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import pytz
