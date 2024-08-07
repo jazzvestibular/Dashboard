@@ -879,7 +879,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Nota na questão'][0],-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Acerto'][0],-1),0)),'FGV')
 
             with st.container():
-                col1, col2, col3 = st.columns([6,0.1,3])
+                col1, col2, col3 = st.columns([3,0.1,1.5])
                 with col1:
                     tabela_assuntos(matematica_tabela3)
                 with col3:
