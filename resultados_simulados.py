@@ -11,6 +11,7 @@ from googleapiclient.errors import HttpError
 from plotly.subplots import make_subplots
 from PIL import Image
 import numpy as np
+from tqdm import tqdm
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
@@ -424,6 +425,17 @@ def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibu
 
                     st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
 
+                    if vestibular == 'Matemática':
+
+                        st.markdown(
+                            f"""
+                            <div style="background-color: white; color: #9E089E; padding: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; text-align: center; font-size: 36px; margin-bottom: 10px;">
+                                <strong>{acerto_aluno} / 30</strong>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
                     if vestibular == 'Insper':
 
                         st.markdown(
@@ -585,8 +597,6 @@ def mostrar_resultados_simulados(nome, permissao, email):
     base_resultados['Disciplina'] = ''
     base_resultados['Assunto'] = ''
 
-    from tqdm import tqdm
-
     bar_color = '#9E089E'
 
     progress_css = """
@@ -719,6 +729,10 @@ def mostrar_resultados_simulados(nome, permissao, email):
         if "FGV" in simulado_selecionado:
 
             cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'FGV Total')
+
+        if "Matemática" in simulado_selecionado:
+
+            cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'Matemática')
 
         base_alunos_fizeram_aux = base[base['Nome do aluno(a)'].isin(alunos_fizeram['Nome do aluno(a)'])].reset_index(drop = True)
 
