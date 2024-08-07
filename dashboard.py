@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="Jazz Vestibular", page_icon="./logo_jazz.png", layout="wide")
+st.set_page_config(page_title="Jazz Vestibular", page_icon="./logo_jazz_menor.png", layout="wide")
 
 st.set_option('client.caching', False)
 
