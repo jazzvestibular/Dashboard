@@ -494,13 +494,6 @@ def mostrar_gamificacao(nome, permissao, email):
     presenca_nota_simulado['Pontuação_Nota_Simulado'] = presenca_nota_simulado['Pontuação Nota'].fillna(0).astype(int)
     duvidas_monitoria['Pontuação_Duvidas_Monitoria'] = duvidas_monitoria['Pontuação'].fillna(0).astype(int)
 
-    #st.dataframe(engajamento_plataforma)
-    #st.dataframe(presenca_aulas)
-    #st.dataframe(presenca_mentoria)
-    #st.dataframe(presenca_nota_simulado)
-    #st.dataframe(duvidas_monitoria)
-
-
     #engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
     engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'sum'}).reset_index()
     #presenca_aulas2 = presenca_aulas.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
@@ -536,7 +529,11 @@ def mostrar_gamificacao(nome, permissao, email):
         presenca_nota_simulado_aluno2 = presenca_nota_simulado_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         duvidas_monitoria_aluno2 = duvidas_monitoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
 
+        
+
         gamificacao1 = pd.merge(presenca_aulas2, engajamento_plataforma2, on = ['Nome do aluno(a)','Turma'], how = 'left')
+
+        st.dataframe(presenca_nota_simulado)
         gamificacao2 = pd.merge(gamificacao1, presenca_mentoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao4 = pd.merge(gamificacao2, presenca_nota_simulado2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao_final = pd.merge(gamificacao4, duvidas_monitoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
