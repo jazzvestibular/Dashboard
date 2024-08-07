@@ -462,7 +462,7 @@ def mostrar_gamificacao(nome, permissao, email):
     presenca_mentoria['Pontuação_Presença_Mentoria'] = presenca_mentoria['Pontuação'].fillna(0).astype(int)
     presenca_nota_simulado['Pontuação_Presença_Simulado'] = presenca_nota_simulado['Pontuação Presença'].fillna(0).astype(int)
     presenca_nota_simulado['Pontuação_Nota_Simulado'] = presenca_nota_simulado['Pontuação Nota'].fillna(0).astype(int)
-    duvidas_monitoria['Pontuação_Duvida_Monitoria'] = duvidas_monitoria['Pontuação'].fillna(0).astype(int)
+    duvidas_monitoria['Pontuação_Duvidas_Monitoria'] = duvidas_monitoria['Pontuação'].fillna(0).astype(int)
 
     #st.dataframe(engajamento_plataforma)
     #st.dataframe(presenca_aulas)
@@ -480,7 +480,7 @@ def mostrar_gamificacao(nome, permissao, email):
     #presenca_nota_simulado2 = presenca_nota_simulado.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
     presenca_nota_simulado2 = presenca_nota_simulado.groupby(['Nome do aluno(a)','Turma']).agg({'Pontuação_Nota_Simulado': 'sum','Pontuação_Presença_Simulado':'sum'}).reset_index()
     #duvidas_monitoria2 = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-    duvidas_monitoria2 = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma']).agg({'Pontuação_Duvida_Monitoria': 'sum'}).reset_index()
+    duvidas_monitoria2 = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma']).agg({'Pontuação_Duvidas_Monitoria': 'sum'}).reset_index()
 
     if permissao == 'Aluno':
 
@@ -518,7 +518,7 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao_final['Pontuação_Presença_Mentoria'] = gamificacao_final['Pontuação_Presença_Mentoria'].astype(int)
         gamificacao_final['Pontuação_Presença_Simulado'] = gamificacao_final['Pontuação_Presença_Simulado'].astype(int)
         gamificacao_final['Pontuação_Nota_Simulado'] = gamificacao_final['Pontuação_Nota_Simulado'].astype(int)
-        gamificacao_final['Pontuação_Duvida_Monitoria'] = gamificacao_final['Pontuação_Duvida_Monitoria'].astype(int)
+        gamificacao_final['Pontuação_Duvidas_Monitoria'] = gamificacao_final['Pontuação_Duvidas_Monitoria'].astype(int)
 
         gamificacao_final['Pontuação'] = (
                 gamificacao_final['Pontuação_Engajamento_Plataforma'] +
@@ -526,7 +526,7 @@ def mostrar_gamificacao(nome, permissao, email):
                 gamificacao_final['Pontuação_Presença_Mentoria'] + 
                 gamificacao_final['Pontuação_Presença_Simulado'] + 
                 gamificacao_final['Pontuação_Nota_Simulado'] +
-                gamificacao_final['Pontuação_Duvida_Monitoria']
+                gamificacao_final['Pontuação_Duvidas_Monitoria']
             )
         
         gamificacao_final['Pontuação_Engajamento_Plataforma_Normalizada'] = gamificacao_final['Pontuação_Engajamento_Plataforma'] / gamificacao_final['Pontuação_Engajamento_Plataforma'].max()
@@ -551,10 +551,10 @@ def mostrar_gamificacao(nome, permissao, email):
             gamificacao_final['Pontuação_Nota_Simulado'] / gamificacao_final['Pontuação_Nota_Simulado'].max()
         )
 
-        gamificacao_final['Pontuação_Duvida_Monitoria_Normalizada'] = np.where(
-            gamificacao_final['Pontuação_Duvida_Monitoria'].max() == 0, 
+        gamificacao_final['Pontuação_Duvidas_Monitoria_Normalizada'] = np.where(
+            gamificacao_final['Pontuação_Duvidas_Monitoria'].max() == 0, 
             0, 
-            gamificacao_final['Pontuação_Duvida_Monitoria'] / gamificacao_final['Pontuação_Duvida_Monitoria'].max()
+            gamificacao_final['Pontuação_Duvidas_Monitoria'] / gamificacao_final['Pontuação_Duvidas_Monitoria'].max()
         )
 
         gamificacao3 = gamificacao_final.sort_values(by = 'Pontuação', ascending = False)
@@ -788,7 +788,7 @@ def mostrar_gamificacao(nome, permissao, email):
                 """
                 st.markdown(mensagem_html_duvida_monitoria, unsafe_allow_html=True)
                 st.markdown(html_br, unsafe_allow_html=True)
-                esferas_bar('Dúvidas na monitoria', gamificacao3_aluno['Pontuação_Duvida_Monitoria_Normalizada'][0], int(round((100*gamificacao3['Pontuação_Duvida_Monitoria_Normalizada'].fillna(0).mean()),0))/100)
+                esferas_bar('Dúvidas na monitoria', gamificacao3_aluno['Pontuação_Duvidas_Monitoria_Normalizada'][0], int(round((100*gamificacao3['Pontuação_Duvidas_Monitoria_Normalizada'].fillna(0).mean()),0))/100)
                 st.markdown(html_br, unsafe_allow_html=True)
                 st.markdown(html_br, unsafe_allow_html=True)
 
@@ -826,7 +826,7 @@ def mostrar_gamificacao(nome, permissao, email):
 
             with col2: 
 
-                categories = ['Pontuação_Engajamento_Plataforma_Normalizada', 'Pontuação_Presença_Aulas_Normalizada', 'Pontuação_Presença_Mentoria_Normalizada', 'Pontuação_Presença_Simulado_Normalizada', 'Pontuação_Nota_Simulado_Normalizada', 'Pontuação_Duvida_Monitoria_Normalizada']
+                categories = ['Pontuação_Engajamento_Plataforma_Normalizada', 'Pontuação_Presença_Aulas_Normalizada', 'Pontuação_Presença_Mentoria_Normalizada', 'Pontuação_Presença_Simulado_Normalizada', 'Pontuação_Nota_Simulado_Normalizada', 'Pontuação_Duvidas_Monitoria_Normalizada']
                 values = gamificacao3_aluno[categories].values.flatten().tolist()
                 medias = gamificacao3_medias.set_index('Métrica').loc[categories]['Média'].tolist()
                 create_radar_chart(categories, values, medias, nome_selecionado)
