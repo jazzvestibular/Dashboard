@@ -564,7 +564,7 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao3['Nível'] = gamificacao3['Pontuação'].apply(definir_nivel, args=(pont_niveis[0], pont_niveis[1], pont_niveis[2], pont_niveis[3], pont_niveis[4], pont_niveis[5]))
 
         gamificacao3_aluno = gamificacao3[gamificacao3['Nome do aluno(a)'] == nome_selecionado].reset_index(drop = True)
-        
+
         #gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).mean().reset_index()
         gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'mean','Pontuação_Presença_Aulas': 'mean','Pontuação_Presença_Simulado': 'mean','Pontuação_Nota_Simulado': 'mean','Pontuação_Duvidas_Monitoria': 'mean'}).reset_index()
         
@@ -826,9 +826,17 @@ def mostrar_gamificacao(nome, permissao, email):
             with col2: 
 
                 categories = ['Pontuação_Engajamento_Plataforma_Normalizada', 'Pontuação_Presença_Aulas_Normalizada', 'Pontuação_Presença_Mentoria_Normalizada', 'Pontuação_Presença_Simulado_Normalizada', 'Pontuação_Nota_Simulado_Normalizada', 'Pontuação_Duvidas_Monitoria_Normalizada']
-                values = gamificacao3_aluno[categories].values.flatten().tolist()
-                medias = gamificacao3_medias.set_index('Métrica').loc[categories]['Média'].tolist()
-                create_radar_chart(categories, values, medias, nome_selecionado)
+                #values = gamificacao3_aluno[categories].values.flatten().tolist()
+                #medias = gamificacao3_medias.set_index('Métrica').loc[categories]['Média'].tolist()
+                #create_radar_chart(categories, values, medias, nome_selecionado)
+
+                gamificacao3_medias = gamificacao3_medias.set_index('Métrica')
+
+                # Verifique se todas as categorias estão no índice
+                if all(cat in gamificacao3_medias.index for cat in categories):
+                    medias = gamificacao3_medias.loc[categories, 'Média'].tolist()
+                else:
+                    print("Algumas categorias estão ausentes no índice.")
 
         st.markdown('<div style="height: 50px;"></div>', unsafe_allow_html=True)
 
