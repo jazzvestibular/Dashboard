@@ -63,7 +63,7 @@ def ler_planilha(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME):
 
     return values2
 
-def card_principal(pontuacao_aluno, pontuacao_media, nivel_aluno):
+def card_principal(pontuacao_aluno, pontuacao_media, nivel_aluno2):
 
     with st.container():
             col1, col2, col3, col4, col5 = st.columns([1,3,1,3,1])
@@ -134,7 +134,7 @@ def card_principal(pontuacao_aluno, pontuacao_media, nivel_aluno):
                 st.markdown(
                         """
                         <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; ">
-                            <strong>Nível</strong>
+                            <strong>Fase</strong>
                         </div>
                         """,
                         unsafe_allow_html=True
@@ -145,7 +145,7 @@ def card_principal(pontuacao_aluno, pontuacao_media, nivel_aluno):
                 st.markdown(
                             f"""
                             <div style="background-color: white; color: #9E089E; padding: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; text-align: center; font-size: 36px; margin-bottom: 10px;">
-                                <strong>{nivel_aluno}</strong>
+                                <strong>{nivel_aluno2}</strong>
                             </div>
                             """,
                             unsafe_allow_html=True
@@ -174,34 +174,64 @@ def card_principal(pontuacao_aluno, pontuacao_media, nivel_aluno):
 
 def definir_nivel(pontuacao, pont_nivel12, pont_nivel23, pont_nivel34, pont_nivel45, pont_nivel56, pont_nivel67):
     if pontuacao == 0:
-        return "Nível 1"
+        #return "Nível 1"
+        return "1ª | Exploration"
     elif pontuacao < pont_nivel12:
-        return "Nível 1"
+        #return "Nível 1"
+        return "1ª | Exploration"
     elif pontuacao < pont_nivel23:
-        return "Nível 2"
+        #return "Nível 2"
+        return "2ª | Discovery"
     elif pontuacao < pont_nivel34:
-        return "Nível 3"
+        #return "Nível 3"
+        return "3ª | Action"
     elif pontuacao < pont_nivel45:
-        return "Nível 4"
+        #return "Nível 4"
+        return "4ª | Confrontation"
     elif pontuacao < pont_nivel56:
-        return "Nível 5"
+        #return "Nível 5"
+        return "5ª | Resilience"
     elif pontuacao < pont_nivel67:
-        return "Nível 6"
+        #return "Nível 6"
+        return "6ª | Experience"
     else:
-        return "Nível 7"
+        #return "Nível 7"
+        return "7ª | Final Battle"
 
 def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_niveis_menor, pont_niveis_maior):
 
-    prox_nivel = int(nivel_aluno[-1]) + 1
+    #prox_nivel = int(nivel_aluno[-1]) + 1
+
+    if id_bar == 1:
+        atual =  "Exploration"
+        proximo = "Discovery"
+    elif id_bar == 2:
+        atual = "Discovery"
+        proximo = "Action"
+    elif id_bar == 3:
+        atual = "Action"
+        proximo = "Confrontation"
+    elif id_bar == 4:
+        atual = "Confrontation"
+        proximo = "Resilience"
+    elif id_bar == 5:
+        atual = "Resilience"
+        proximo = "Experience"
+    elif id_bar == 6:
+        atual = "Experience"
+        proximo = "Final Battle"
+    elif id_bar == 7:
+        atual = "Final Battle"
+        proximo = ""
 
     with st.container():
 
-        col1, col2, col3 = st.columns([1,10,1])
+        col1, col2, col3 = st.columns([1,3,1])
 
         with col1:
             mensagem_html_principal = f"""
             <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 0px; text-align: left">
-                <p style="font-size: 24px; color: #333; margin: 0;">Nível <strong style="color: #9E089E;">{id_bar}</strong></p>
+                <p style="font-size: 24px; color: #333; margin: 0;">Fase <strong style="color: #9E089E;">{atual}</strong></p>
             </div>
             """
 
@@ -224,7 +254,7 @@ def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_
         with col3:
             mensagem_html_principal = f"""
             <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 0px; text-align: right">
-                <p style="font-size: 24px; color: #333; margin: 0;">Nível <strong style="color: #9E089E;">{id_bar+1}</strong></p>
+                <p style="font-size: 24px; color: #333; margin: 0;">Fase <strong style="color: #9E089E;">{proximo}</strong></p>
             </div>
             """
 
@@ -253,7 +283,7 @@ def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_
             """
         mensagem_html = f"""
         <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 10px;">
-            <p style="font-size: 16px; color: #333; margin: 0;">Faltam <strong style="color: #9E089E;">{pontos_para_proximo_nivel}</strong> pontos para você alcançar o Nível <strong style="color: #9E089E;">{prox_nivel}</strong>!</p>
+            <p style="font-size: 16px; color: #333; margin: 0;">Faltam <strong style="color: #9E089E;">{pontos_para_proximo_nivel}</strong> pontos para você alcançar a Fase <strong style="color: #9E089E;">{proximo}</strong>!</p>
         </div>
         """
         
@@ -273,7 +303,7 @@ def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_
 
             mensagem_html = f"""
             <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 10px;">
-                <p style="font-size: 16px; color: #333; margin: 0;">Faltam <strong style="color: #9E089E;">{pontos_para_proximo_nivel}</strong> pontos para você alcançar o Nível <strong style="color: #9E089E;">{prox_nivel}</strong>!</p>
+                <p style="font-size: 16px; color: #333; margin: 0;">Faltam <strong style="color: #9E089E;">{pontos_para_proximo_nivel}</strong> pontos para você alcançar a Fase <strong style="color: #9E089E;">{proximo}</strong>!</p>
             </div>
             """
 
@@ -288,7 +318,7 @@ def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_
 
             mensagem_html = f"""
             <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 10px;">
-                <p style="font-size: 16px; color: #333; margin: 0;">Alcance o Nível <strong style="color: #9E089E;">{id_bar}</strong> para avançar rumo ao Nível <strong style="color: #9E089E;">{id_bar+1}!</p>
+                <p style="font-size: 16px; color: #333; margin: 0;">Alcance a Fase <strong style="color: #9E089E;">{atual}</strong> para avançar rumo a Fase <strong style="color: #9E089E;">{proximo}!</p>
             </div>
             """
         
@@ -416,7 +446,7 @@ def tabela_pontuacoes(gamificacao, nome_selecionado):
                         <tr style="background-color: rgba(158, 8, 158, 0.8); color: white; font-weight: bold;">
                             <th style="width: 300px; min-width: 300px; max-width: 300px; text-align: center; border-top-left-radius: 10px;border-right: 1px solid rgba(158, 8, 158, 0.8);border-left: 0px solid rgba(158, 8, 158, 0.8);border-top: 0px solid rgba(158, 8, 158, 0.8);">Aluno(a)</th>
                             <th style="width: 150px; min-width: 150px; max-width: 150px; text-align: center;border-right: 1px solid rgba(158, 8, 158, 0.8);border-top: 0px solid rgba(158, 8, 158, 0.8);">Turma</th>
-                            <th style="width: 150px; min-width: 150px; max-width: 150px; text-align: center;border-right: 1px solid rgba(158, 8, 158, 0.8);border-top: 0px solid rgba(158, 8, 158, 0.8);">Nível</th>
+                            <th style="width: 150px; min-width: 150px; max-width: 150px; text-align: center;border-right: 1px solid rgba(158, 8, 158, 0.8);border-top: 0px solid rgba(158, 8, 158, 0.8);">Fase</th>
                             <th style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-top-right-radius: 10px;border-right: 0px solid rgba(158, 8, 158, 0.8);border-top: 0px solid rgba(158, 8, 158, 0.8)">Pontuação</th>
                         </tr>
                     </thead>
@@ -575,6 +605,8 @@ def mostrar_gamificacao(nome, permissao, email):
         pontuacao_media = gamificacao3['Pontuação'].mean().round(0).astype(int)
 
         nivel_aluno = gamificacao3_aluno['Nível'][0]
+        nivel_aluno2 = int(nivel_aluno[0])
+        #st.write(nivel_aluno)
 
         st.markdown('<div style="height: 0px;"></div>', unsafe_allow_html=True)
 
@@ -609,7 +641,7 @@ def mostrar_gamificacao(nome, permissao, email):
         st.markdown(
                             """
                             <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; font-size: 24px;">
-                                <strong>Progressão de Nível</strong>
+                                <strong>Progressão de Fase</strong>
                             </div>
                             """,
                             unsafe_allow_html=True
@@ -618,12 +650,12 @@ def mostrar_gamificacao(nome, permissao, email):
         #st.markdown(html_br, unsafe_allow_html=True)
         st.markdown(html_br, unsafe_allow_html=True)
 
-        if int(nivel_aluno[-1]) < (len(pont_niveis) + 1):
-            pontos_para_proximo_nivel = pont_niveis[int(nivel_aluno[-1])-1] - pontuacao_aluno
+        if int(nivel_aluno2) < (len(pont_niveis) + 1):
+            pontos_para_proximo_nivel = pont_niveis[int(nivel_aluno2)-1] - pontuacao_aluno
         else:
             pontos_para_proximo_nivel = 0
 
-        if nivel_aluno == 'Nível 1':
+        if nivel_aluno == '1ª | Exploration':
 
             progress = pontuacao_aluno / pont_niveis[0]
             progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, 1, 0, pont_niveis[0])
@@ -638,7 +670,7 @@ def mostrar_gamificacao(nome, permissao, email):
             #st.markdown(html_br, unsafe_allow_html=True)
             progress_bar(0, nivel_aluno, pontos_para_proximo_nivel, 6, pont_niveis[4], pont_niveis[5])
 
-        if nivel_aluno == 'Nível 2':   
+        if nivel_aluno == '2ª | Discovery':   
 
             progress_bar(1, nivel_aluno, pontos_para_proximo_nivel, 1, 0, pont_niveis[0])
             #st.markdown(html_br, unsafe_allow_html=True)
@@ -653,7 +685,7 @@ def mostrar_gamificacao(nome, permissao, email):
             #st.markdown(html_br, unsafe_allow_html=True)
             progress_bar(0, nivel_aluno, pontos_para_proximo_nivel, 6, pont_niveis[4], pont_niveis[5])
 
-        if nivel_aluno == 'Nível 3':   
+        if nivel_aluno == '3ª | Action':   
 
             progress_bar(1, nivel_aluno, pontos_para_proximo_nivel, 1, 0, pont_niveis[0])
             #st.markdown(html_br, unsafe_allow_html=True)
@@ -668,7 +700,7 @@ def mostrar_gamificacao(nome, permissao, email):
             #st.markdown(html_br, unsafe_allow_html=True)
             progress_bar(0, nivel_aluno, pontos_para_proximo_nivel, 6, pont_niveis[4], pont_niveis[5])
 
-        if nivel_aluno == 'Nível 4':   
+        if nivel_aluno == '4ª | Confrontation':   
 
             progress_bar(1, nivel_aluno, pontos_para_proximo_nivel, 1, 0, pont_niveis[0])
             #st.markdown(html_br, unsafe_allow_html=True)
@@ -683,7 +715,7 @@ def mostrar_gamificacao(nome, permissao, email):
             #st.markdown(html_br, unsafe_allow_html=True)
             progress_bar(0, nivel_aluno, pontos_para_proximo_nivel, 6, pont_niveis[4], pont_niveis[5])
 
-        if nivel_aluno == 'Nível 5':   
+        if nivel_aluno == '5ª | Resilience':   
 
             progress_bar(1, nivel_aluno, pontos_para_proximo_nivel, 1, 0, pont_niveis[0])
             st.markdown(html_br, unsafe_allow_html=True)
@@ -698,7 +730,7 @@ def mostrar_gamificacao(nome, permissao, email):
             st.markdown(html_br, unsafe_allow_html=True)
             progress_bar(0, nivel_aluno, pontos_para_proximo_nivel, 6, pont_niveis[4], pont_niveis[5])
 
-        if nivel_aluno == 'Nível 6':   
+        if nivel_aluno == '6ª | Experience':   
 
             progress_bar(1, nivel_aluno, pontos_para_proximo_nivel, 1, 0, pont_niveis[0])
             st.markdown(html_br, unsafe_allow_html=True)
@@ -713,7 +745,7 @@ def mostrar_gamificacao(nome, permissao, email):
             progress = (pontuacao_aluno - pont_niveis[4])  / (pont_niveis[5] - pont_niveis[4])
             progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, 6, pont_niveis[4], pont_niveis[5])
 
-        if nivel_aluno == 'Nível 7':   
+        if nivel_aluno == '7ª | Final Battle':   
 
             progress_bar(1, nivel_aluno, pontos_para_proximo_nivel, 1, 0, 1)
             st.markdown(html_br, unsafe_allow_html=True)
@@ -835,8 +867,6 @@ def mostrar_gamificacao(nome, permissao, email):
                 # Verifique se todas as categorias estão no índice
                 if all(cat in gamificacao3_medias.index for cat in categories):
                     medias = gamificacao3_medias.loc[categories, 'Média'].tolist()
-                else:
-                    print("Algumas categorias estão ausentes no índice.")
 
         st.markdown('<div style="height: 50px;"></div>', unsafe_allow_html=True)
 
