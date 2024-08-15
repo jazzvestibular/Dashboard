@@ -12,6 +12,9 @@ from plotly.subplots import make_subplots
 from PIL import Image
 import numpy as np
 from tqdm import tqdm
+import datetime
+from logs import escrever_planilha
+import pytz
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
@@ -26,6 +29,14 @@ def get_estado():
     if 'estado' not in st.session_state:
         st.session_state.estado = define_estado()
     return st.session_state.estado
+
+def dia_hora():
+
+    fuso_horario_brasilia = pytz.timezone('America/Sao_Paulo')
+    data_e_hora_brasilia = datetime.datetime.now(fuso_horario_brasilia)
+    data_hoje_brasilia = str(data_e_hora_brasilia.date())
+    hora_atual_brasilia = str(data_e_hora_brasilia.strftime('%H:%M:%S'))
+    return data_hoje_brasilia, hora_atual_brasilia
 
 def ler_planilha(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME):
     creds = None
@@ -324,7 +335,6 @@ def tabela_questoes(df):
         df['Resultado Individual'] = (df['Resultado Individual'] * 100).round(0).astype(int).astype(str) + '%'
         #df['Resultado Geral'] = (df['Resultado Geral'] * 100).round(0).astype(int).astype(str) + '%'
         df['Resultado Geral'] = df['Resultado Geral'].apply(lambda x: f"{x * 100:.2f}%")
-        st.dataframe(df)
 
         for _, row in df.iterrows():
             # Definir a cor de fundo com base no status
@@ -559,10 +569,16 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     #base_resultados_insper = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | 1ª fase!A1:P22000")
     #base_matriz_insper = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Matriz Questões!A1:F1000")
-    base_redacao_insper = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação!A1:I22000")
+    base_redacao_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
 
     base_resultados_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Matemática Básica!A1:I3000")
+
     base_matriz_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Matemática Básica!A1:D1000")
+
+    base_resultados_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:I4000")
+
+    base_matriz_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:D1000")
+
 
     turma_eng12 = 'Engenharias e Ciência da Computação'
     turma_cien12 = 'Engenharias e Ciência da Computação'
@@ -587,8 +603,13 @@ def mostrar_resultados_simulados(nome, permissao, email):
     base_matriz_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Matriz Questões | FGV!A1:F1000")
     base_redacao_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação | FGV!A1:I22000")
 
-    base_resultados = base_resultados_matbasica.copy()
-    base_matriz = base_matriz_matbasica.copy()
+    #base_resultados = base_resultados_matbasica.copy()
+
+    base_resultados = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
+
+    base_matriz = pd.concat([base_matriz_matbasica, base_matriz_insper], axis=0).reset_index()
+
+    #base_matriz = base_matriz_matbasica.copy()
 
     #base_resultados = pd.concat([base_resultados_insper, base_resultados_fgv], ignore_index=True)
     #base_matriz = pd.concat([base_matriz_insper, base_matriz_fgv], ignore_index=True)
@@ -628,6 +649,8 @@ def mostrar_resultados_simulados(nome, permissao, email):
             turma_atual = base_resultados['turma'][i]
             simulado_atual = base_resultados['Simulado'][i]
             num_exercicio_atual = base_resultados['num_exercicio'][i]
+            #st.write(i)
+            #st.write(simulado_atual)
 
             matriz_questoes = base_matriz[base_matriz['Simulado'] == simulado_atual]
 
@@ -670,6 +693,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     resultados_gerais = base.groupby(['Nome da avaliação','Turma','Nome do aluno(a)','Login do aluno(a)','Simulado']).sum().reset_index()
 
+
     resultados_gerais2 = resultados_gerais.groupby(['Turma','Nome do aluno(a)','Login do aluno(a)','Simulado']).sum().reset_index()
     resultados_gerais2_aux = resultados_gerais2.copy()
     for i in range(len(resultados_gerais2_aux['Login do aluno(a)'])):
@@ -681,6 +705,20 @@ def mostrar_resultados_simulados(nome, permissao, email):
     simulados = resultados_gerais3['Simulado'].drop_duplicates().sort_values()
 
     simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
+
+    data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+
+    if permissao == 'Aluno':
+
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], simulado_selecionado, "", email]]
+
+    else:
+
+        nome_aluno4 = resultados_gerais3[resultados_gerais3['Login do aluno(a)'] == login_aluno]['Nome do aluno(a)'].reset_index()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], simulado_selecionado, nome_aluno4['Nome do aluno(a)'][0], email]]
+
+    escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
 
     if len(login_aluno) > 0:
 
@@ -766,6 +804,8 @@ def mostrar_resultados_simulados(nome, permissao, email):
         resultados_disciplina_aluno = resultados_gerais_disciplina3[resultados_gerais_disciplina3['Login do aluno(a)'] == login_aluno].reset_index()
         resultados_disciplina_aluno2 = resultados_disciplina_aluno.sort_values(by = 'Disciplina', ascending = False)
 
+        resultados_disciplina_aluno2 = resultados_disciplina_aluno2.drop(columns=['level_0'])
+
         resultados_matematica = resultados_disciplina_aluno2[resultados_disciplina_aluno2['Disciplina'] == 'Matemática'].reset_index()
         resultados_linguagens = resultados_disciplina_aluno2[resultados_disciplina_aluno2['Disciplina'] == 'Linguagens'].reset_index()
         resultados_lingua_port = resultados_disciplina_aluno2[resultados_disciplina_aluno2['Disciplina'] == 'Língua Portuguesa'].reset_index()
@@ -780,12 +820,12 @@ def mostrar_resultados_simulados(nome, permissao, email):
         resultados_gerais_disciplina3_nat = resultados_gerais_disciplina3[resultados_gerais_disciplina3['Disciplina'] == 'Ciências da Natureza'].reset_index(drop = True).reset_index()
         resultados_gerais_disciplina3_ing = resultados_gerais_disciplina3[resultados_gerais_disciplina3['Disciplina'] == 'Inglês'].reset_index(drop = True).reset_index()
                     
-        classificacao_aluno_mat = resultados_gerais_disciplina3_mat[resultados_gerais_disciplina3_mat['Login do aluno(a)'] == login_aluno].reset_index()
-        classificacao_aluno_lin = resultados_gerais_disciplina3_lin[resultados_gerais_disciplina3_lin['Login do aluno(a)'] == login_aluno].reset_index()
-        classificacao_aluno_lp = resultados_gerais_disciplina3_lp[resultados_gerais_disciplina3_lp['Login do aluno(a)'] == login_aluno].reset_index()
-        classificacao_aluno_hum = resultados_gerais_disciplina3_hum[resultados_gerais_disciplina3_hum['Login do aluno(a)'] == login_aluno].reset_index()
-        classificacao_aluno_nat = resultados_gerais_disciplina3_nat[resultados_gerais_disciplina3_nat['Login do aluno(a)'] == login_aluno].reset_index()
-        classificacao_aluno_ing = resultados_gerais_disciplina3_ing[resultados_gerais_disciplina3_ing['Login do aluno(a)'] == login_aluno].reset_index()    
+        #classificacao_aluno_mat = resultados_gerais_disciplina3_mat[resultados_gerais_disciplina3_mat['Login do aluno(a)'] == login_aluno].reset_index()
+        #classificacao_aluno_lin = resultados_gerais_disciplina3_lin[resultados_gerais_disciplina3_lin['Login do aluno(a)'] == login_aluno].reset_index()
+        #classificacao_aluno_lp = resultados_gerais_disciplina3_lp[resultados_gerais_disciplina3_lp['Login do aluno(a)'] == login_aluno].reset_index()
+        #classificacao_aluno_hum = resultados_gerais_disciplina3_hum[resultados_gerais_disciplina3_hum['Login do aluno(a)'] == login_aluno].reset_index()
+        #classificacao_aluno_nat = resultados_gerais_disciplina3_nat[resultados_gerais_disciplina3_nat['Login do aluno(a)'] == login_aluno].reset_index()
+        #classificacao_aluno_ing = resultados_gerais_disciplina3_ing[resultados_gerais_disciplina3_ing['Login do aluno(a)'] == login_aluno].reset_index()    
 
         resultados_gerais_disciplina_med_mat = resultados_gerais_disciplina5[resultados_gerais_disciplina5['Disciplina'] == 'Matemática'].reset_index(drop = True)
         resultados_gerais_disciplina_med_lin = resultados_gerais_disciplina5[resultados_gerais_disciplina5['Disciplina'] == 'Linguagens'].reset_index(drop = True)
@@ -798,12 +838,12 @@ def mostrar_resultados_simulados(nome, permissao, email):
         if len(resultados_ciencias_hum['Disciplina']) == 0:
                 resultados_ciencias_fim = resultados_ciencias_nat.copy()
                 resultados_gerais_disciplina3_fim = resultados_gerais_disciplina3_nat.copy()
-                classificacao_aluno_fim = classificacao_aluno_nat.copy()
+                #classificacao_aluno_fim = classificacao_aluno_nat.copy()
                 resultados_gerais_disciplina_med_cie = resultados_gerais_disciplina_med_nat.copy()
         else:
                 resultados_ciencias_fim = resultados_ciencias_hum.copy()
                 resultados_gerais_disciplina3_fim = resultados_gerais_disciplina3_hum.copy()
-                classificacao_aluno_fim = classificacao_aluno_hum.copy()
+                #classificacao_aluno_fim = classificacao_aluno_hum.copy()
                 resultados_gerais_disciplina_med_cie = resultados_gerais_disciplina_med_hum.copy()
 
         base_alunos_fizeram['Login do aluno(a)'] = base_alunos_fizeram['Login do aluno(a)'].apply(extract_login)

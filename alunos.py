@@ -105,7 +105,7 @@ def mostrar_alunos(nome, permissao, email):
             data_hoje_brasilia, hora_atual_brasilia = dia_hora()
             data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
-            mostrar_resultados_simulados()
+            mostrar_resultados_simulados(nome, permissao, email)
 
     elif permissao == 'Aluno':
 

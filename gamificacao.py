@@ -11,6 +11,9 @@ from googleapiclient.errors import HttpError
 from plotly.subplots import make_subplots
 from PIL import Image
 import numpy as np
+from logs import escrever_planilha
+import datetime
+import pytz
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
@@ -25,6 +28,14 @@ def get_estado():
     if 'estado' not in st.session_state:
         st.session_state.estado = define_estado()
     return st.session_state.estado
+
+def dia_hora():
+
+    fuso_horario_brasilia = pytz.timezone('America/Sao_Paulo')
+    data_e_hora_brasilia = datetime.datetime.now(fuso_horario_brasilia)
+    data_hoje_brasilia = str(data_e_hora_brasilia.date())
+    hora_atual_brasilia = str(data_e_hora_brasilia.strftime('%H:%M:%S'))
+    return data_hoje_brasilia, hora_atual_brasilia
 
 def ler_planilha(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME):
     creds = None
@@ -336,13 +347,31 @@ def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_
         
         mensagem_html = f"""
         <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 10px;">
-            <p style="font-size: 16px; color: #333; margin: 0;">Você já alcançou o Nível <strong style="color: #9E089E;">{id_bar+1}</strong>! Parabéns!!</p>
+            <p style="font-size: 16px; color: #333; margin: 0;">Você já alcançou a Fase <strong style="color: #9E089E;">{proximo}</strong>! Parabéns!!</p>
         </div>
         """
         
         st.markdown(progress_bar_html_nivel, unsafe_allow_html=True)
 
         st.markdown(mensagem_html, unsafe_allow_html=True)
+
+        if proximo == 'Discovery':
+
+            html_br="""
+            <br>
+            """
+
+            #st.markdown(html_br, unsafe_allow_html=True)
+
+            mensagem_html_contato_breve = f"""
+            <div style="width: 100%; background-color: #ffffff; border-radius: 8px; padding: 10px;">
+                <p style="font-size: 16px; color: #333; margin: 0;">Entraremos em contato com você em breve!!</p>
+            </div>
+            """
+
+            st.markdown(mensagem_html_contato_breve, unsafe_allow_html=True)
+
+
 
 def esferas_bar(esfera, pont_normalizado_aluno, pont_normalizado_media):
 
@@ -481,10 +510,13 @@ def mostrar_gamificacao(nome, permissao, email):
     engajamento_plataforma = ler_planilha("12T-TRAZsGYGqnYjbn-K_PZrme-ygyUWJSfuR-LQ0JT8", "Streamlit | Engajamento na plataforma!A1:J")
     presenca_aulasMT1 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
     presenca_aulasT2 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
-    presenca_aulas = pd.concat([presenca_aulasT2, presenca_aulasMT1], axis=0)
+    presenca_aulasNT1 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
+    presenca_aulas_aux = pd.concat([presenca_aulasT2, presenca_aulasMT1], axis=0)
+    presenca_aulas = pd.concat([presenca_aulas_aux, presenca_aulasNT1], axis=0)
     presenca_mentoria = ler_planilha("1EEzqMd2uBnL5-7-19FhYS3w_s_wVa21s0TN_2wPHUdk", "Streamlit | Presença na mentoria!A1:F")
     presenca_nota_simulado = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Streamlit | Presença + Notas simulado!A1:L")
     duvidas_monitoria = ler_planilha("1SCYS-8FccRCvK18CMqMGFWpTKRlDgzBGAaG26dBsWCg", "Streamlit | Monitoria!A1:O")
+    presenca_aulas_2fase = ler_planilha("13AsGUjRUBaachB_9Zjq_-4G7xcxyWFvJtI_0XmF5zfg", "Streamlit | Presença nas aulas | 2ª fase!A1:G10000")
 
     engajamento_plataforma['Pontuação_Engajamento_Plataforma'] = engajamento_plataforma['Pontuação'].fillna(0).astype(int)
     presenca_aulas['Pontuação_Presença_Aulas'] = presenca_aulas['Pontuação'].fillna(0).astype(int)
@@ -493,6 +525,7 @@ def mostrar_gamificacao(nome, permissao, email):
     presenca_nota_simulado['Pontuação_Presença_Simulado'] = presenca_nota_simulado['Pontuação Presença'].fillna(0).astype(int)
     presenca_nota_simulado['Pontuação_Nota_Simulado'] = presenca_nota_simulado['Pontuação Nota'].fillna(0).astype(int)
     duvidas_monitoria['Pontuação_Duvidas_Monitoria'] = duvidas_monitoria['Pontuação'].fillna(0).astype(int)
+    presenca_aulas_2fase['Pontuação_Presença_2Fase'] = presenca_aulas_2fase['Pontuação'].fillna(0).astype(int)
 
     #engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
     engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'sum'}).reset_index()
@@ -505,6 +538,8 @@ def mostrar_gamificacao(nome, permissao, email):
     #duvidas_monitoria2 = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
     duvidas_monitoria2 = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma']).agg({'Pontuação_Duvidas_Monitoria': 'sum'}).reset_index()
 
+    presenca_aulas_2fase2 = presenca_aulas_2fase.groupby(['Nome do aluno(a)','Turma']).agg({'Pontuação_Presença_2Fase': 'sum'}).reset_index()
+
     if permissao == 'Aluno':
 
         nome_selecionado = nome
@@ -515,6 +550,10 @@ def mostrar_gamificacao(nome, permissao, email):
 
         nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
 
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
+        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
     if nome_selecionado != "Escolha o(a) aluno(a)":
 
         engajamento_plataforma_aluno = engajamento_plataforma[engajamento_plataforma['Nome do aluno(a)'] == nome_selecionado]
@@ -522,19 +561,19 @@ def mostrar_gamificacao(nome, permissao, email):
         presenca_mentoria_aluno = presenca_mentoria[presenca_mentoria['Nome do aluno(a)'] == nome_selecionado]
         presenca_nota_simulado_aluno = presenca_nota_simulado[presenca_nota_simulado['Nome do aluno(a)'] == nome_selecionado]
         duvidas_monitoria_aluno = duvidas_monitoria[duvidas_monitoria['Nome do aluno(a)'] == nome_selecionado]
+        presenca_aulas_2fase_aluno = presenca_aulas_2fase[presenca_aulas_2fase['Nome do aluno(a)'] == nome_selecionado]
 
         engajamento_plataforma_aluno2 = engajamento_plataforma_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         presenca_aulas_aluno2 = presenca_aulas_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         presenca_mentoria_aluno2 = presenca_mentoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         presenca_nota_simulado_aluno2 = presenca_nota_simulado_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         duvidas_monitoria_aluno2 = duvidas_monitoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-
-        
+        presenca_aulas_2fase_aluno2 = presenca_aulas_2fase_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
 
         gamificacao1 = pd.merge(presenca_aulas2, engajamento_plataforma2, on = ['Nome do aluno(a)','Turma'], how = 'left')
-
         gamificacao2 = pd.merge(gamificacao1, presenca_mentoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao4 = pd.merge(gamificacao2, presenca_nota_simulado2, on = ['Nome do aluno(a)','Turma'], how = 'left')
+        gamificacao4 = pd.merge(gamificacao4, presenca_aulas_2fase2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao_final = pd.merge(gamificacao4, duvidas_monitoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
 
         gamificacao_final.fillna(0, inplace=True)
@@ -545,6 +584,7 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao_final['Pontuação_Presença_Simulado'] = gamificacao_final['Pontuação_Presença_Simulado'].astype(int)
         gamificacao_final['Pontuação_Nota_Simulado'] = gamificacao_final['Pontuação_Nota_Simulado'].astype(int)
         gamificacao_final['Pontuação_Duvidas_Monitoria'] = gamificacao_final['Pontuação_Duvidas_Monitoria'].astype(int)
+        gamificacao_final['Pontuação_Presença_2Fase'] = gamificacao_final['Pontuação_Presença_2Fase'].astype(int)
 
         gamificacao_final['Pontuação'] = (
                 gamificacao_final['Pontuação_Engajamento_Plataforma'] +
@@ -552,11 +592,12 @@ def mostrar_gamificacao(nome, permissao, email):
                 gamificacao_final['Pontuação_Presença_Mentoria'] + 
                 gamificacao_final['Pontuação_Presença_Simulado'] + 
                 gamificacao_final['Pontuação_Nota_Simulado'] +
-                gamificacao_final['Pontuação_Duvidas_Monitoria']
+                gamificacao_final['Pontuação_Duvidas_Monitoria'] +
+                gamificacao_final['Pontuação_Presença_2Fase']
             )
         
         gamificacao_final['Pontuação_Engajamento_Plataforma_Normalizada'] = gamificacao_final['Pontuação_Engajamento_Plataforma'] / gamificacao_final['Pontuação_Engajamento_Plataforma'].max()
-        gamificacao_final['Pontuação_Presença_Aulas_Normalizada'] = gamificacao_final['Pontuação_Presença_Aulas'] / gamificacao_final['Pontuação_Presença_Aulas'].max() 
+        gamificacao_final['Pontuação_Presença_Aulas_Normalizada'] = (gamificacao_final['Pontuação_Presença_Aulas'] + gamificacao_final['Pontuação_Presença_2Fase'])  / (gamificacao_final['Pontuação_Presença_Aulas'].max() + gamificacao_final['Pontuação_Presença_2Fase'].max())
         #gamificacao2['Pontuação_Presença_Mentoria_Normalizada'] = gamificacao2['Pontuação_Presença_Mentoria'] / gamificacao2['Pontuação_Presença_Mentoria'].max()    
 
         gamificacao_final['Pontuação_Presença_Mentoria_Normalizada'] = np.where(
@@ -592,7 +633,7 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao3_aluno = gamificacao3[gamificacao3['Nome do aluno(a)'] == nome_selecionado].reset_index(drop = True)
 
         #gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).mean().reset_index()
-        gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'mean','Pontuação_Presença_Aulas': 'mean','Pontuação_Presença_Simulado': 'mean','Pontuação_Nota_Simulado': 'mean','Pontuação_Duvidas_Monitoria': 'mean'}).reset_index()
+        gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'mean','Pontuação_Presença_Aulas': 'mean','Pontuação_Presença_Simulado': 'mean','Pontuação_Nota_Simulado': 'mean','Pontuação_Duvidas_Monitoria': 'mean','Pontuação_Presença_2Fase': 'mean'}).reset_index()
         
         gamificacao3_medias.columns = ['Métrica', 'Média']
 
