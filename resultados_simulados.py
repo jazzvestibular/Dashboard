@@ -636,13 +636,43 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     if permissao == 'Aluno':
 
-        login_aluno = email
-
+        nome_selecionado = nome
+    
     else:
 
-        login_aluno = st.text_input('Digite o seu login', '')
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(base_resultados['aluno_nome'].unique())
 
-    if login_aluno != '':
+        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
+
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
+        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
+    #if permissao == 'Aluno':
+
+    #    login_aluno = email
+
+    #else:
+
+    #    nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(base_resultados['aluno_nome'].unique())
+    #    nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
+
+    #    if nome_selecionado != 'Escolha o(a) aluno(a)':
+
+    #        auxiliar_aluno = base_resultados[base_resultados['aluno_nome'] == nome_selecionado].reset_index(drop = True)  
+    #        login_aluno = auxiliar_aluno['aluno_login'][0]
+
+    #    else:
+
+    #        login_aluno = ''
+
+        #login_aluno = st.text_input('Digite o seu login', '')
+
+    if nome_selecionado != 'Escolha o(a) aluno(a)':
+
+        auxiliar_aluno = base_resultados[base_resultados['aluno_nome'] == nome_selecionado].reset_index(drop = True)  
+        login_aluno = auxiliar_aluno['aluno_login'][0]
+    #if login_aluno != '':
         #estado['pagina_atual'] = 'Alunos - Resultados nos simulados [pós login]'
         # Substituindo o range(len(...)) pelo tqdm para adicionar a barra de progresso
         for i in tqdm(range(len(base_resultados['atividade_nome'])), desc='Processando dados', unit='item'):
@@ -714,19 +744,21 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     else:
 
-        nome_aluno4 = resultados_gerais3[resultados_gerais3['Login do aluno(a)'] == login_aluno]['Nome do aluno(a)'].reset_index()
-        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], simulado_selecionado, nome_aluno4['Nome do aluno(a)'][0], email]]
+        nome_aluno4 = nome_selecionado
+        #nome_aluno4 = resultados_gerais3[resultados_gerais3['Login do aluno(a)'] == login_aluno]['Nome do aluno(a)'].reset_index()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], simulado_selecionado, nome_aluno4, email]]
+        #data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], simulado_selecionado, nome_aluno4['Nome do aluno(a)'][0], email]]
 
     escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
 
 
-    if len(login_aluno) > 0:
+    if nome_selecionado != 'Escolha o(a) aluno(a)':
 
         resultados_gerais3["Login do aluno(a)"] = resultados_gerais3["Login do aluno(a)"].apply(extract_login)
         nome_aluno3 = resultados_gerais3[resultados_gerais3['Login do aluno(a)'] == login_aluno]['Nome do aluno(a)'].reset_index()
         turma_aluno = resultados_gerais3[resultados_gerais3['Login do aluno(a)'] == login_aluno]['Turma'].reset_index()
 
-    if login_aluno != '':
+    if nome_selecionado != 'Escolha o(a) aluno(a)':
 
         resultados_gerais_aluno1 = resultados_gerais3[resultados_gerais3['Nome do aluno(a)'] == nome_aluno3['Nome do aluno(a)'][0]]
         resultados_gerais_aluno = resultados_gerais_aluno1[resultados_gerais_aluno1['Simulado'] == simulado_selecionado].reset_index()

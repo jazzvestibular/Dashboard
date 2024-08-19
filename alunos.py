@@ -45,7 +45,7 @@ def mostrar_alunos(nome, permissao, email):
             """
         components.html(f"{htmlstr}", height=0, width=0)
 
-    if permissao != 'Aluno':
+    if permissao == 'Administrador':
 
         with st.container():
                 col1, col2, col3, col4, col5 = st.columns([1,1,1,1,1])
@@ -107,7 +107,7 @@ def mostrar_alunos(nome, permissao, email):
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
             mostrar_resultados_simulados(nome, permissao, email)
 
-    elif permissao == 'Aluno':
+    elif (permissao == 'Aluno' or permissao == 'Mentor'):
 
         with st.container():
                 col1, col2, col3, col4, col5 = st.columns([1,1,1,1,1])
@@ -151,7 +151,7 @@ def mostrar_alunos(nome, permissao, email):
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
             mostrar_gamificacao(nome, permissao, email)
 
-        elif botao_clicado13:
+        elif botao_clicado13 or estado['pagina_atual'] == 'Alunos - Resultados nos simulados':
             estado['pagina_atual'] = 'Alunos - Resultados nos simulados'
             data_hoje_brasilia, hora_atual_brasilia = dia_hora()
             data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]

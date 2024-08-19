@@ -185,36 +185,38 @@ def mostrar_botoes(permissao, nome, email):
 
             mostrar_mentoria(nome, permissao, email)
 
-    elif permissao == "Mentor":
+    #elif permissao == "Mentor":
+    #
+    #    container = st.container()
+    #    with container:
+    #        cols = st.columns([1])  
+    #        col9 = cols[0]  
+    #        botao_clicado1 = col9.button('Alunos', key='b1')
+    #        ChangeButtonColour('Alunos', 'white', '#9E089E')
+    #        #botao_clicado9 = col9.button('Mentoria', key='b9')
+    #        #ChangeButtonColour('Mentoria', 'white', '#9E089E')
+    #
+    #    st.markdown(
+    #        """
+    #        <hr style="border: 1px solid #9E089E; margin-top: -30px;">
+    #        """,
+    #        unsafe_allow_html=True
+    #    )
+    #
+    #    botoes_menu = [botao_clicado9]
+    #
+    #    if all(not botao for botao in botoes_menu):
+    #        estado = get_estado()
+    #       estado['pagina_atual'] = 'Alunos'
+    #        mostrar_mentoria(nome, permissao, email)
+    #
+    #    if botao_clicado9:
+    #        estado = get_estado()
+    #        estado['pagina_atual'] = 'Alunos'
+    #
+    #        mostrar_mentoria(nome, permissao, email)
 
-        container = st.container()
-        with container:
-            cols = st.columns([1])  
-            col9 = cols[0]  
-            botao_clicado9 = col9.button('Mentoria', key='b9')
-            ChangeButtonColour('Mentoria', 'white', '#9E089E')
-
-        st.markdown(
-            """
-            <hr style="border: 1px solid #9E089E; margin-top: -30px;">
-            """,
-            unsafe_allow_html=True
-        )
-
-        botoes_menu = [botao_clicado9]
-
-        if all(not botao for botao in botoes_menu):
-            estado = get_estado()
-            estado['pagina_atual'] = 'Mentoria'
-            mostrar_mentoria(nome, permissao, email)
-
-        if botao_clicado9:
-            estado = get_estado()
-            estado['pagina_atual'] = 'Mentoria'
-
-            mostrar_mentoria(nome, permissao, email)
-
-    elif permissao == 'Aluno':
+    elif (permissao == 'Aluno' or permissao == 'Mentor'):
 
         container = st.container()
         with container:
@@ -234,12 +236,12 @@ def mostrar_botoes(permissao, nome, email):
 
         if all(not botao for botao in botoes_menu):
             estado = get_estado()
-            estado['pagina_atual'] = 'Alunos'
+            #estado['pagina_atual'] = 'Alunos'
             mostrar_alunos(nome, permissao, email)
 
         if botao_clicado1:
             estado = get_estado()
-            estado['pagina_atual'] = 'Alunos'
+            #estado['pagina_atual'] = 'Alunos'
 
             mostrar_alunos(nome, permissao, email)
 
