@@ -565,6 +565,10 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
+    alunos = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Alunos!A1:E")
+    alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
+    alunos = alunos[alunos['Alunos'] != '']
+
     #### BASES INSPER
 
     base_redacao_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
@@ -638,7 +642,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
     
     else:
 
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(base_resultados['aluno_nome'].unique())
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Alunos'].unique())
 
         nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
 

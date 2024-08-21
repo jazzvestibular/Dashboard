@@ -507,6 +507,11 @@ def mostrar_gamificacao(nome, permissao, email):
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
+    alunos = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Alunos!A1:E")
+    alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
+    alunos = alunos[alunos['Alunos'] != '']
+    alunos.rename(columns = {'Alunos':'Nome do aluno(a)'}, inplace = True)
+
     engajamento_plataforma = ler_planilha("12T-TRAZsGYGqnYjbn-K_PZrme-ygyUWJSfuR-LQ0JT8", "Streamlit | Engajamento na plataforma!A1:J")
     presenca_aulasMT1 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
     presenca_aulasT2 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
@@ -520,7 +525,6 @@ def mostrar_gamificacao(nome, permissao, email):
 
     engajamento_plataforma['Pontuação_Engajamento_Plataforma'] = engajamento_plataforma['Pontuação'].fillna(0).astype(int)
     presenca_aulas['Pontuação_Presença_Aulas'] = presenca_aulas['Pontuação'].fillna(0).astype(int)
-    presenca_aulas_selectbox = presenca_aulas.copy()
     presenca_aulas = presenca_aulas[presenca_aulas['Pontuação_Presença_Aulas'] > 0]
     presenca_mentoria['Pontuação_Presença_Mentoria'] = presenca_mentoria['Pontuação'].fillna(0).astype(int)
     presenca_nota_simulado['Pontuação_Presença_Simulado'] = presenca_nota_simulado['Pontuação Presença'].fillna(0).astype(int)
@@ -547,7 +551,7 @@ def mostrar_gamificacao(nome, permissao, email):
     
     else:
 
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(presenca_aulas_selectbox['Nome do aluno(a)'].unique())
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Nome do aluno(a)'].unique())
 
         nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
 
@@ -571,7 +575,8 @@ def mostrar_gamificacao(nome, permissao, email):
         duvidas_monitoria_aluno2 = duvidas_monitoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         presenca_aulas_2fase_aluno2 = presenca_aulas_2fase_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
 
-        gamificacao1 = pd.merge(presenca_aulas2, engajamento_plataforma2, on = ['Nome do aluno(a)','Turma'], how = 'left')
+        gamificacao = pd.merge(alunos, presenca_aulas2, on = ['Nome do aluno(a)','Turma'], how = 'left')
+        gamificacao1 = pd.merge(gamificacao, engajamento_plataforma2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao2 = pd.merge(gamificacao1, presenca_mentoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao4 = pd.merge(gamificacao2, presenca_nota_simulado2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao4 = pd.merge(gamificacao4, presenca_aulas_2fase2, on = ['Nome do aluno(a)','Turma'], how = 'left')
@@ -626,6 +631,7 @@ def mostrar_gamificacao(nome, permissao, email):
         )
 
         gamificacao3 = gamificacao_final.sort_values(by = 'Pontuação', ascending = False)
+        gamificacao3 = gamificacao3[gamificacao3['Pontuação'] > 0]
 
         pont_niveis = [400, 1000, 1900, 2800, 3700, 5200]
 
