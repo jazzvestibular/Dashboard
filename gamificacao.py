@@ -520,6 +520,7 @@ def mostrar_gamificacao(nome, permissao, email):
 
     engajamento_plataforma['Pontuação_Engajamento_Plataforma'] = engajamento_plataforma['Pontuação'].fillna(0).astype(int)
     presenca_aulas['Pontuação_Presença_Aulas'] = presenca_aulas['Pontuação'].fillna(0).astype(int)
+    presenca_aulas_selectbox = presenca_aulas.copy()
     presenca_aulas = presenca_aulas[presenca_aulas['Pontuação_Presença_Aulas'] > 0]
     presenca_mentoria['Pontuação_Presença_Mentoria'] = presenca_mentoria['Pontuação'].fillna(0).astype(int)
     presenca_nota_simulado['Pontuação_Presença_Simulado'] = presenca_nota_simulado['Pontuação Presença'].fillna(0).astype(int)
@@ -546,7 +547,7 @@ def mostrar_gamificacao(nome, permissao, email):
     
     else:
 
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(presenca_aulas['Nome do aluno(a)'].unique())
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(presenca_aulas_selectbox['Nome do aluno(a)'].unique())
 
         nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
 
