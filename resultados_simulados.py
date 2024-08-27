@@ -974,7 +974,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Nota na questão'][0],-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Acerto'][0],-1),0)),'FGV')
 
             with st.container():
-                col1, col2, col3 = st.columns([6,0.1,4])
+                col1, col2, col3 = st.columns([5,0.1,2])
                 with col1:
                     tabela_assuntos(matematica_tabela3)
                 with col3:
@@ -1076,7 +1076,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
         if len(resultados_linguagens['Nome do aluno(a)']) != 0 or  len(resultados_lingua_port['Nome do aluno(a)']) != 0:
 
             with st.container():
-                    col1, col2, col3 = st.columns([6,0.1,4])
+                    col1, col2, col3 = st.columns([5,0.1,2])
                     with col1:
                         tabela_assuntos(linguagens_tabela3)
                     with col3:
@@ -1148,7 +1148,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 cards_principais(int(round(resultados_ingles['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Nota na questão'][0],-1),0)), int(round(resultados_ingles['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Acerto'][0],-1),0)),'FGV')
 
             with st.container():
-                col1, col2, col3 = st.columns([6,0.1,4])
+                col1, col2, col3 = st.columns([5,0.1,2])
                 with col1:
                     tabela_assuntos(ingles_tabela3)
                 with col3:
@@ -1240,7 +1240,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                     cards_principais(int(round(resultados_ciencias_fim['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Nota na questão'][0],-1),0)), int(round(resultados_ciencias_fim['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Acerto'][0],-1),0)),'FGV')
 
                 with st.container():
-                    col1, col2, col3 = st.columns([6,0.1,4])
+                    col1, col2, col3 = st.columns([5,0.1,2])
                     with col1:
                         tabela_assuntos(ciencias_tabela3)
                     with col3:
@@ -1356,7 +1356,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
             base_redacao5 = base_redacao3aux['Nota na questão'].mean()
 
             with st.container():
-                    col1, col2, col3 = st.columns([6,0.1,4])
+                    col1, col2, col3 = st.columns([5,0.1,2])
                     with col1:
                         tabela_competencias(redacao_tabela3)
                     with col3:
