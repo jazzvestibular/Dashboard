@@ -571,15 +571,21 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     #### BASES INSPER
 
-    base_redacao_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
+    base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
+    base_redacao_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 02!A1:I22000")
+    base_redacao_insper = pd.concat([base_redacao_insper1, base_redacao_insper2], axis=0).reset_index()
 
     base_resultados_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Matemática Básica!A1:I3000")
 
     base_matriz_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Matemática Básica!A1:G1000")
 
-    base_resultados_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:I4000")
+    base_resultados_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:I4000")
+    base_resultados_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 02!A1:I4000")
+    base_resultados_insper = pd.concat([base_resultados_insper1, base_resultados_insper2], axis=0).reset_index()
 
-    base_matriz_insper = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:G1000")
+    base_matriz_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:G1000")
+    base_matriz_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 02!A1:G1000")
+    base_matriz_insper = pd.concat([base_matriz_insper1, base_matriz_insper2], axis=0).reset_index()
 
     ### BASES FGV
 
@@ -610,9 +616,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
     turma_dir2 = 'Administração, Economia e Direito'
 
     base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
+    base_resultados_aux = base_resultados_aux.drop(columns = ['level_0'])
     base_resultados = pd.concat([base_resultados_aux, base_resultados_fgv], axis=0).reset_index()
 
     base_matriz_aux = pd.concat([base_matriz_matbasica, base_matriz_insper], axis=0).reset_index()
+    base_matriz_aux = base_matriz_aux.drop(columns = ['level_0'])
     base_matriz = pd.concat([base_matriz_aux, base_matriz_fgv], axis=0).reset_index()
 
     base_redacao = pd.concat([base_redacao_insper, base_redacao_fgv], ignore_index=True)
