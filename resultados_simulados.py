@@ -589,9 +589,13 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     ### BASES FGV
 
-    base_resultados_fgv = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 01!A1:I4000")
+    base_resultados_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 01!A1:I4000")
+    base_resultados_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:I4000")
+    base_resultados_fgv = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0).reset_index()
 
-    base_matriz_fgv = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 01!A1:G1000")
+    base_matriz_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 01!A1:G1000")
+    base_matriz_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 02!A1:G61")
+    base_matriz_fgv = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0).reset_index()
 
     base_redacao_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação | FGV!A1:I22000")
 
