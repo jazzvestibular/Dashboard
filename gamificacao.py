@@ -369,9 +369,7 @@ def progress_bar(progress, nivel_aluno, pontos_para_proximo_nivel, id_bar, pont_
             </div>
             """
 
-            st.markdown(mensagem_html_contato_breve, unsafe_allow_html=True)
-
-
+            #st.markdown(mensagem_html_contato_breve, unsafe_allow_html=True)
 
 def esferas_bar(esfera, pont_normalizado_aluno, pont_normalizado_media):
 
@@ -440,21 +438,6 @@ def create_radar_chart(original_categories, values, medias, nome_selecionado):
 
 def tabela_pontuacoes(gamificacao, nome_selecionado):
 
-    st.markdown(
-                            """
-                            <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; font-size: 24px;">
-                                <strong>Tabela de resultados</strong>
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
-    
-    html_br="""
-            <br>
-            """
-
-    st.markdown(html_br, unsafe_allow_html=True)
-
     with st.container():
         col1, col2, col3 = st.columns([1.15,4,1]) 
 
@@ -497,9 +480,77 @@ def tabela_pontuacoes(gamificacao, nome_selecionado):
                     <td style="width: 300px; min-width: 300px; max-width: 300px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Nome do aluno(a)']}</td>
                     <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Turma']}</td>
                     <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Nível']}</td>
-                    <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Pontuação']}</td>
+                    <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Pontuação selecionada']}</td>
                 </tr>
                 """, unsafe_allow_html=True)
+
+def grafico_pontuacao_semanal(gamificacao, nome_selecionado, esferas_selecionadas):
+
+    gamificacao_aluno = gamificacao[gamificacao['Nome do aluno(a)'] == nome_selecionado]
+
+    # Calculando a média de pontuação por semana
+    media_por_semana = gamificacao.groupby(['Nome do aluno(a)', 'Semana'])['Pontuação'].sum().groupby('Semana').mean().reset_index()
+    media_por_semana['Pontuação'] = media_por_semana['Pontuação'].round(2)
+
+    # Obtendo as esferas únicas
+    if len(esferas_selecionadas) == 0:
+
+        esferas_unicas = gamificacao['Esfera'].unique()
+
+    else:
+
+        esferas_unicas = esferas_selecionadas
+
+    cores_esferas = {
+    "Presença nas aulas de 1ª fase": "rgba(0, 128, 255, 0.9)",   # Um tom de azul claro
+    "Presença nas aulas de 2ª fase": "rgba(128, 255, 0, 0.9)",   # Um tom de verde claro
+    "Presença nas mentorias": "rgba(255, 153, 51, 0.9)",         # Um tom de laranja suave
+    "Presença nos simulados": "rgba(102, 51, 153, 0.9)",         # Um tom de roxo suave
+    "Nota nos simulados": "rgba(255, 77, 77, 0.9)",              # Um tom de vermelho claro
+    "Dúvidas na monitoria": "rgba(255, 255, 204, 0.9)",          # Um tom de amarelo bem suave
+    "Engajamento na plataforma": "rgba(191, 191, 255, 0.9)",     # Um tom de azul/lilás suave
+}
+
+    # Criando o gráfico
+    fig = go.Figure()
+
+    # Adicionando as barras empilhadas para cada esfera
+    for esfera in esferas_unicas:
+        pontuacao_por_semana = gamificacao_aluno[gamificacao_aluno['Esfera'] == esfera].groupby('Semana')['Pontuação'].sum().reset_index()
+        fig.add_trace(go.Bar(
+            x=pontuacao_por_semana['Semana'],
+            y=pontuacao_por_semana['Pontuação'],
+            name=esfera,
+            marker_color=cores_esferas.get(esfera, 'gray')  # Define a cor ou usa cinza como padrão
+        ))
+
+    # Adicionando a linha da média
+    #fig.add_trace(go.Scatter(
+    #    x=media_por_semana['Semana'],
+    #    y=media_por_semana['Pontuação'],
+    #    mode='lines+markers',
+    #    name='Média Geral',
+    #    line=dict(color='red', width=2),
+    #))
+
+    # Atualizando layout
+    fig.update_layout(
+        #title='Pontuação por Semana',
+        xaxis_title='Semana',
+        yaxis_title='Pontuação',
+        barmode='stack',  # Para empilhar as colunas
+        legend=dict(
+            orientation='h',  # Horizontal
+            yanchor='bottom',
+            y=1.1,
+            xanchor='center',
+            x=0.5
+        ),
+        #width=1000,  # Largura do gráfico (ajuste conforme necessário)
+        #height=500  # Altura do gráfico (ajuste conforme necessário)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)  # O gráfico usará toda a largura do container
 
 def mostrar_gamificacao(nome, permissao, email):
 
@@ -531,6 +582,61 @@ def mostrar_gamificacao(nome, permissao, email):
     presenca_nota_simulado['Pontuação_Nota_Simulado'] = presenca_nota_simulado['Pontuação Nota'].fillna(0).astype(int)
     duvidas_monitoria['Pontuação_Duvidas_Monitoria'] = duvidas_monitoria['Pontuação'].fillna(0).astype(int)
     presenca_aulas_2fase['Pontuação_Presença_2Fase'] = presenca_aulas_2fase['Pontuação'].fillna(0).astype(int)
+
+    #engajamento_plataforma = engajamento_plataforma[engajamento_plataforma['Pontuação_Engajamento_Plataforma'] > 0]
+    engajamento_plataforma['Data de conclusão'] = pd.to_datetime(engajamento_plataforma['Data de conclusão'], format='%d/%m/%Y %H:%M:%S', errors='coerce')
+    engajamento_plataforma['Semana'] = engajamento_plataforma['Data de conclusão'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) else None)
+    engajamento_plataforma['Semana'] = engajamento_plataforma['Semana'] - 30 ## Ajuste
+    presenca_aulas['Data de conclusão'] = pd.to_datetime(presenca_aulas['Data'], format='%d/%m/%Y', errors='coerce')
+    presenca_aulas['Semana'] = presenca_aulas['Data de conclusão'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) else None)
+    presenca_aulas['Semana'] = presenca_aulas['Semana'] - 30 ## Ajuste
+    presenca_mentoria['Data de conclusão'] = pd.to_datetime(presenca_mentoria['Data'], format='%d/%m/%Y', errors='coerce')
+    presenca_mentoria['Semana'] = presenca_mentoria['Data de conclusão'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) else None)
+    presenca_mentoria['Semana'] = presenca_mentoria['Semana'] - 30 ## Ajuste
+    #presenca_nota_simulado = presenca_nota_simulado[presenca_nota_simulado['Pontuação_Presença_Simulado'] > 0]
+    presenca_nota_simulado['Data de conclusão'] = presenca_nota_simulado['Data de conclusão'].str.replace(r'\s+', ' ', regex=True).str.strip()
+    presenca_nota_simulado['Data de conclusão 2'] = pd.to_datetime(presenca_nota_simulado['Data de conclusão'], errors='coerce',infer_datetime_format=True)
+    presenca_nota_simulado['Semana'] = presenca_nota_simulado['Data de conclusão 2'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) and x != '' else None)
+    presenca_nota_simulado['Semana'] = presenca_nota_simulado['Semana'] - 30 ## Ajuste
+    duvidas_monitoria['Data de conclusão'] = duvidas_monitoria['Data'].str.replace(r', às', ' ', regex=True).str.strip()
+    duvidas_monitoria['Data de conclusão'] = pd.to_datetime(duvidas_monitoria['Data de conclusão'], format='%d/%m/%Y %H:%M:%S',errors='coerce')
+    duvidas_monitoria['Semana'] = duvidas_monitoria['Data de conclusão'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) else None)
+    duvidas_monitoria['Semana'] = duvidas_monitoria['Semana'] - 30
+    presenca_aulas_2fase['Data de conclusão'] = pd.to_datetime(presenca_aulas_2fase['Data'], format='%d/%m/%Y', errors='coerce')
+    presenca_aulas_2fase['Semana'] = presenca_aulas_2fase['Data de conclusão'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) else None)
+    presenca_aulas_2fase['Semana'] = presenca_aulas_2fase['Semana'] - 30 ## Ajuste
+
+    engajamento_plataforma_semana = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma','Semana']).agg({'Pontuação_Engajamento_Plataforma': 'sum'}).reset_index()
+    engajamento_plataforma_semana['Esfera'] = 'Engajamento na plataforma'
+    engajamento_plataforma_semana.rename(columns = {'Pontuação_Engajamento_Plataforma':'Pontuação'}, inplace = True)
+    presenca_aulas_semana = presenca_aulas.groupby(['Nome do aluno(a)', 'Turma','Semana']).agg({'Pontuação_Presença_Aulas': 'sum'}).reset_index()
+    presenca_aulas_semana['Esfera'] = 'Presença nas aulas de 1ª fase'
+    presenca_aulas_semana.rename(columns = {'Pontuação_Presença_Aulas':'Pontuação'}, inplace = True)
+    presenca_mentoria_semana = presenca_mentoria.groupby(['Nome do aluno(a)','Turma','Semana']).agg({'Pontuação_Presença_Mentoria': 'sum'}).reset_index()
+    presenca_mentoria_semana['Esfera'] = 'Presença nas mentorias'
+    presenca_mentoria_semana.rename(columns = {'Pontuação_Presença_Mentoria':'Pontuação'}, inplace = True)
+    presenca_nota_simulado_semana = presenca_nota_simulado.groupby(['Nome do aluno(a)','Turma','Semana']).agg({'Pontuação_Nota_Simulado': 'sum','Pontuação_Presença_Simulado':'sum'}).reset_index()
+    nota_simulado_semana = presenca_nota_simulado_semana.drop(columns = ['Pontuação_Presença_Simulado'])
+    presenca_simulado_semana = presenca_nota_simulado_semana.drop(columns = ['Pontuação_Nota_Simulado'])
+    nota_simulado_semana ['Esfera'] = 'Nota nos simulados'
+    presenca_simulado_semana ['Esfera'] = 'Presença nos simulados'
+    nota_simulado_semana.rename(columns = {'Pontuação_Nota_Simulado':'Pontuação'}, inplace = True)
+    presenca_simulado_semana.rename(columns = {'Pontuação_Presença_Simulado':'Pontuação'}, inplace = True)
+    duvidas_monitoria_semana = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma','Semana']).agg({'Pontuação_Duvidas_Monitoria': 'sum'}).reset_index()
+    duvidas_monitoria_semana['Esfera'] = 'Dúvidas na monitoria'
+    duvidas_monitoria_semana.rename(columns = {'Pontuação_Duvidas_Monitoria':'Pontuação'}, inplace = True)
+    presenca_aulas_2fase_semana = presenca_aulas_2fase.groupby(['Nome do aluno(a)','Turma','Semana']).agg({'Pontuação_Presença_2Fase': 'sum'}).reset_index()
+    presenca_aulas_2fase_semana['Esfera'] = 'Presença nas aulas de 2ª fase'
+    presenca_aulas_2fase_semana.rename(columns = {'Pontuação_Presença_2Fase':'Pontuação'}, inplace = True)
+
+    gamificacao_semana1 = pd.concat([presenca_aulas_semana, presenca_aulas_2fase_semana], axis=0)
+    gamificacao_semana2 = pd.concat([gamificacao_semana1, presenca_mentoria_semana], axis=0)
+    gamificacao_semana3 = pd.concat([gamificacao_semana2, presenca_simulado_semana], axis=0)
+    gamificacao_semana4 = pd.concat([gamificacao_semana3, nota_simulado_semana], axis=0)
+    gamificacao_semana5 = pd.concat([gamificacao_semana4, duvidas_monitoria_semana], axis=0)
+    gamificacao_semana6 = pd.concat([gamificacao_semana5, engajamento_plataforma_semana], axis=0)
+
+    gamificacao_semana6 = gamificacao_semana6[gamificacao_semana6['Semana'] > 0]
 
     #engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
     engajamento_plataforma2 = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'sum'}).reset_index()
@@ -568,12 +674,12 @@ def mostrar_gamificacao(nome, permissao, email):
         duvidas_monitoria_aluno = duvidas_monitoria[duvidas_monitoria['Nome do aluno(a)'] == nome_selecionado]
         presenca_aulas_2fase_aluno = presenca_aulas_2fase[presenca_aulas_2fase['Nome do aluno(a)'] == nome_selecionado]
 
-        engajamento_plataforma_aluno2 = engajamento_plataforma_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-        presenca_aulas_aluno2 = presenca_aulas_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-        presenca_mentoria_aluno2 = presenca_mentoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-        presenca_nota_simulado_aluno2 = presenca_nota_simulado_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-        duvidas_monitoria_aluno2 = duvidas_monitoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
-        presenca_aulas_2fase_aluno2 = presenca_aulas_2fase_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+        #engajamento_plataforma_aluno2 = engajamento_plataforma_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+        #presenca_aulas_aluno2 = presenca_aulas_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+        #presenca_mentoria_aluno2 = presenca_mentoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+        #presenca_nota_simulado_aluno2 = presenca_nota_simulado_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+        #duvidas_monitoria_aluno2 = duvidas_monitoria_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+        #presenca_aulas_2fase_aluno2 = presenca_aulas_2fase_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
 
         gamificacao = pd.merge(alunos, presenca_aulas2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao1 = pd.merge(gamificacao, engajamento_plataforma2, on = ['Nome do aluno(a)','Turma'], how = 'left')
@@ -621,7 +727,7 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao_final['Pontuação_Nota_Simulado_Normalizada'] = np.where(
             gamificacao_final['Pontuação_Nota_Simulado'].max() == 0, 
             0, 
-            gamificacao_final['Pontuação_Nota_Simulado'] / gamificacao_final['Pontuação_Nota_Simulado'].max()
+            gamificacao_final['Pontuação_Nota_Simulado'] / gamificacao_final['Pontuação_Nota_Simulado'].max() 
         )
 
         gamificacao_final['Pontuação_Duvidas_Monitoria_Normalizada'] = np.where(
@@ -636,7 +742,7 @@ def mostrar_gamificacao(nome, permissao, email):
         pont_niveis = [400, 1000, 1900, 2800, 3700, 5200]
 
         gamificacao3['Nível'] = gamificacao3['Pontuação'].apply(definir_nivel, args=(pont_niveis[0], pont_niveis[1], pont_niveis[2], pont_niveis[3], pont_niveis[4], pont_niveis[5]))
-
+        
         gamificacao3_aluno = gamificacao3[gamificacao3['Nome do aluno(a)'] == nome_selecionado].reset_index(drop = True)
 
         #gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).mean().reset_index()
@@ -650,11 +756,8 @@ def mostrar_gamificacao(nome, permissao, email):
 
         nivel_aluno = gamificacao3_aluno['Nível'][0]
         nivel_aluno2 = int(nivel_aluno[0])
-        #st.write(nivel_aluno)
 
         st.markdown('<div style="height: 0px;"></div>', unsafe_allow_html=True)
-
-        #nome_maiusculo = 
 
         with st.container():
 
@@ -679,7 +782,42 @@ def mostrar_gamificacao(nome, permissao, email):
         st.markdown(html_br, unsafe_allow_html=True)
 
         card_principal(pontuacao_aluno, pontuacao_media, nivel_aluno)
-        
+
+        with st.container():
+
+            col1, col2, col3 = st.columns([0.001,10,0.001])
+
+            with col2:
+
+                st.markdown('<div style="height: 50px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                                        """
+                                        <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; font-size: 24px;">
+                                            <strong>Pontuação semanal por esfera</strong>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                html_br="""
+                        <br>
+                        """
+
+                st.markdown(html_br, unsafe_allow_html=True)
+
+                esferas_unicas = sorted(gamificacao_semana6['Esfera'].unique())
+
+                esferas_selecionadas = st.multiselect('Selecione a(s) esfera(s)', esferas_unicas)
+
+                data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+                esferas_selecionadas_str = ", ".join(esferas_selecionadas)
+
+                if esferas_selecionadas_str != '':
+                    data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "Esferas Gráfico " + esferas_selecionadas_str, nome_selecionado, email]]
+                    escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
+                grafico_pontuacao_semanal(gamificacao_semana6, nome_selecionado, esferas_selecionadas)
+
         st.markdown('<div style="height: 50px;"></div>', unsafe_allow_html=True)
 
         st.markdown(
@@ -912,7 +1050,74 @@ def mostrar_gamificacao(nome, permissao, email):
                 if all(cat in gamificacao3_medias.index for cat in categories):
                     medias = gamificacao3_medias.loc[categories, 'Média'].tolist()
 
+        st.markdown(
+                                """
+                                <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; font-size: 24px;">
+                                    <strong>Tabela de resultados</strong>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+        
+        html_br="""
+                <br>
+                """
+
+        st.markdown(html_br, unsafe_allow_html=True)
+
+        semanas_disponiveis = gamificacao_semana6['Semana'].unique()
+
+        semanas_selecionadas = st.slider(
+            'Selecione o intervalo de semanas',
+            min_value=int(min(semanas_disponiveis)),
+            max_value=int(max(semanas_disponiveis)),
+            value=(int(min(semanas_disponiveis)), int(max(semanas_disponiveis)))
+        )
+
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        semanas_selecionadas_str = ", ".join(map(str, semanas_selecionadas))
+
+        min_semanas_disponiveis = int(min(semanas_disponiveis))
+        max_semanas_disponiveis = int(max(semanas_disponiveis))
+
+        if not (semanas_selecionadas[0] == min_semanas_disponiveis and semanas_selecionadas[1] == max_semanas_disponiveis):
+
+            data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "Semanas Tabela " + semanas_selecionadas_str, nome_selecionado, email]]
+            escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
+        esferas_unicas = sorted(gamificacao_semana6['Esfera'].unique())
+
+        esferas_selecionadas = st.multiselect('Selecione a(s) esfera(s)', esferas_unicas, key='esferas_selecionadas')
+
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        esferas_selecionadas_str = ", ".join(esferas_selecionadas)
+
+        if esferas_selecionadas_str != '':
+            data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "Esferas Tabela " + esferas_selecionadas_str, nome_selecionado, email]]
+            escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+    
+        if len(esferas_selecionadas) == 0:
+
+            esferas_unicas = gamificacao_semana6['Esfera'].unique()
+
+        else:
+
+            esferas_unicas = esferas_selecionadas
+
+        semana_inicial, semana_final = semanas_selecionadas
+        gamificacao_semana7 = gamificacao_semana6[
+            (gamificacao_semana6['Semana'] >= semana_inicial) & 
+            (gamificacao_semana6['Semana'] <= semana_final)
+        ] 
+
+        gamificacao_semana7_aux = gamificacao_semana7[gamificacao_semana7['Esfera'].isin(esferas_unicas)].reset_index(drop = True)
+
+        gamificacao_semana8 = gamificacao_semana7_aux.groupby(['Nome do aluno(a)']).sum().reset_index()
+        gamificacao_semana9 = pd.merge(gamificacao3, gamificacao_semana8, on = ['Nome do aluno(a)'], how = 'left')
+        gamificacao_semana9.rename(columns = {'Pontuação_y':'Pontuação selecionada'}, inplace = True)
+        gamificacao_semana9['Pontuação selecionada'] = gamificacao_semana9['Pontuação selecionada'].fillna(0).astype(int)
+        gamificacao_semana10 = gamificacao_semana9.sort_values(by = 'Pontuação selecionada', ascending = False)
         st.markdown('<div style="height: 50px;"></div>', unsafe_allow_html=True)
 
-        tabela_pontuacoes(gamificacao3, nome_selecionado)
+        tabela_pontuacoes(gamificacao_semana10, nome_selecionado)
 
