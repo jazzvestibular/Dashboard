@@ -1112,8 +1112,9 @@ def mostrar_gamificacao(nome, permissao, email):
 
         gamificacao_semana7_aux = gamificacao_semana7[gamificacao_semana7['Esfera'].isin(esferas_unicas)].reset_index(drop = True)
 
-        gamificacao_semana8 = gamificacao_semana7_aux.groupby(['Nome do aluno(a)']).sum().reset_index()
-        gamificacao_semana9 = pd.merge(gamificacao3, gamificacao_semana8, on = ['Nome do aluno(a)'], how = 'left')
+        gamificacao_semana8 = gamificacao_semana7_aux.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
+
+        gamificacao_semana9 = pd.merge(gamificacao3, gamificacao_semana8, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao_semana9.rename(columns = {'Pontuação_y':'Pontuação selecionada'}, inplace = True)
         gamificacao_semana9['Pontuação selecionada'] = gamificacao_semana9['Pontuação selecionada'].fillna(0).astype(int)
         gamificacao_semana10 = gamificacao_semana9.sort_values(by = 'Pontuação selecionada', ascending = False)
