@@ -570,7 +570,7 @@ def mostrar_gamificacao(nome, permissao, email):
     presenca_aulas_aux = pd.concat([presenca_aulasT2, presenca_aulasMT1], axis=0)
     presenca_aulas = pd.concat([presenca_aulas_aux, presenca_aulasNT1], axis=0)
     presenca_mentoria = ler_planilha("1EEzqMd2uBnL5-7-19FhYS3w_s_wVa21s0TN_2wPHUdk", "Streamlit | Presença na mentoria!A1:F")
-    presenca_nota_simulado = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Streamlit | Presença + Notas simulado!A1:L")
+    presenca_nota_simulado = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Streamlit | Presença + Notas simulado!A1:R")
     duvidas_monitoria = ler_planilha("1SCYS-8FccRCvK18CMqMGFWpTKRlDgzBGAaG26dBsWCg", "Streamlit | Monitoria!A1:O")
     presenca_aulas_2fase = ler_planilha("13AsGUjRUBaachB_9Zjq_-4G7xcxyWFvJtI_0XmF5zfg", "Streamlit | Presença nas aulas | 2ª fase!A1:G10000")
 
