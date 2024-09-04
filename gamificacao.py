@@ -605,7 +605,6 @@ def mostrar_gamificacao(nome, permissao, email):
     presenca_aulas_2fase['Data de conclusão'] = pd.to_datetime(presenca_aulas_2fase['Data'], format='%d/%m/%Y', errors='coerce')
     presenca_aulas_2fase['Semana'] = presenca_aulas_2fase['Data de conclusão'].apply(lambda x: x.isocalendar()[1] if pd.notnull(x) else None)
     presenca_aulas_2fase['Semana'] = presenca_aulas_2fase['Semana'] - 30 ## Ajuste
-    st.dataframe(presenca_nota_simulado)
     engajamento_plataforma_semana = engajamento_plataforma.groupby(['Nome do aluno(a)', 'Turma','Semana']).agg({'Pontuação_Engajamento_Plataforma': 'sum'}).reset_index()
     engajamento_plataforma_semana['Esfera'] = 'Engajamento na plataforma'
     engajamento_plataforma_semana.rename(columns = {'Pontuação_Engajamento_Plataforma':'Pontuação'}, inplace = True)
