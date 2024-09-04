@@ -621,6 +621,7 @@ def mostrar_gamificacao(nome, permissao, email):
     nota_simulado_semana ['Esfera'] = 'Nota nos simulados'
     presenca_simulado_semana ['Esfera'] = 'Presença nos simulados'
     nota_simulado_semana.rename(columns = {'Pontuação_Nota_Simulado':'Pontuação'}, inplace = True)
+    st.dataframe(nota_simulado_semana)
     presenca_simulado_semana.rename(columns = {'Pontuação_Presença_Simulado':'Pontuação'}, inplace = True)
     duvidas_monitoria_semana = duvidas_monitoria.groupby(['Nome do aluno(a)','Turma','Semana']).agg({'Pontuação_Duvidas_Monitoria': 'sum'}).reset_index()
     duvidas_monitoria_semana['Esfera'] = 'Dúvidas na monitoria'
