@@ -686,7 +686,6 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao4 = pd.merge(gamificacao2, presenca_nota_simulado2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao4 = pd.merge(gamificacao4, presenca_aulas_2fase2, on = ['Nome do aluno(a)','Turma'], how = 'left')
         gamificacao_final = pd.merge(gamificacao4, duvidas_monitoria2, on = ['Nome do aluno(a)','Turma'], how = 'left')
-
         gamificacao_final.fillna(0, inplace=True)
 
         gamificacao_final['Pontuação_Engajamento_Plataforma'] = gamificacao_final['Pontuação_Engajamento_Plataforma'].astype(int)
@@ -736,7 +735,7 @@ def mostrar_gamificacao(nome, permissao, email):
         )
 
         gamificacao3 = gamificacao_final.sort_values(by = 'Pontuação', ascending = False)
-        gamificacao3 = gamificacao3[gamificacao3['Pontuação'] > 0]
+        gamificacao3 = gamificacao3[gamificacao3['Pontuação'] >= 0]
 
         pont_niveis = [400, 1000, 1900, 2800, 3700, 5200]
 
@@ -748,8 +747,8 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao3_medias = gamificacao3.drop(columns=['Nome do aluno(a)', 'Turma']).agg({'Pontuação_Engajamento_Plataforma': 'mean','Pontuação_Presença_Aulas': 'mean','Pontuação_Presença_Simulado': 'mean','Pontuação_Nota_Simulado': 'mean','Pontuação_Duvidas_Monitoria': 'mean','Pontuação_Presença_2Fase': 'mean'}).reset_index()
         
         gamificacao3_medias.columns = ['Métrica', 'Média']
-
         pontuacao_aluno = gamificacao3_aluno['Pontuação'][0]
+        
 
         pontuacao_media = gamificacao3['Pontuação'].mean().round(0).astype(int)
 
