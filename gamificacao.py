@@ -558,15 +558,15 @@ def mostrar_gamificacao(nome, permissao, email):
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
-    alunos = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Alunos!A1:E")
+    alunos = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Alunos!A1:E")
     alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
     alunos = alunos[alunos['Alunos'] != '']
     alunos.rename(columns = {'Alunos':'Nome do aluno(a)'}, inplace = True)
 
     engajamento_plataforma = ler_planilha("12T-TRAZsGYGqnYjbn-K_PZrme-ygyUWJSfuR-LQ0JT8", "Streamlit | Engajamento na plataforma!A1:J")
-    presenca_aulasMT1 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
-    presenca_aulasT2 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
-    presenca_aulasNT1 = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
+    presenca_aulasMT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
+    presenca_aulasT2 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
+    presenca_aulasNT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
     presenca_aulas_aux = pd.concat([presenca_aulasT2, presenca_aulasMT1], axis=0)
     presenca_aulas = pd.concat([presenca_aulas_aux, presenca_aulasNT1], axis=0)
     presenca_mentoria = ler_planilha("1EEzqMd2uBnL5-7-19FhYS3w_s_wVa21s0TN_2wPHUdk", "Streamlit | Presença na mentoria!A1:F")

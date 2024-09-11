@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
-from presenca_alunos import mostrar_presenca_alunos
+from presenca_aulas import mostrar_presenca_aulas
 from gamificacao import mostrar_gamificacao
 from resultados_simulados import mostrar_resultados_simulados
 import datetime
@@ -53,14 +53,14 @@ def mostrar_alunos(nome, permissao, email):
                     botao_clicado12 = col1.button('Gamificação', key='b12')
                     ChangeButtonColour('Gamificação', 'white', '#ff80e6')
                 with col2:
-                    botao_clicado10 = col2.button('Presença nas aulas', key='b10')
-                    ChangeButtonColour('Presença nas aulas', 'white', '#ff80e6')
-                with col3:
-                    botao_clicado11 = col3.button('Engajamento na plataforma', key='b11')
-                    ChangeButtonColour('Engajamento na plataforma', 'white', '#ff80e6')
-                with col4:
-                    botao_clicado13 = col4.button('Resultado nos simulados', key='b13')
+                    botao_clicado13 = col2.button('Resultado nos simulados', key='b13')
                     ChangeButtonColour('Resultado nos simulados', 'white', '#ff80e6')
+                with col3:
+                    botao_clicado10 = col3.button('Presença nas aulas', key='b10')
+                    ChangeButtonColour('Presença nas aulas', 'white', '#ff80e6')
+                with col4:
+                    botao_clicado11 = col4.button('Engajamento na plataforma', key='b11')
+                    ChangeButtonColour('Engajamento na plataforma', 'white', '#ff80e6')
                 with col5:
                     st.write("")
 
@@ -73,7 +73,7 @@ def mostrar_alunos(nome, permissao, email):
 
         botoes_menu = [botao_clicado10, botao_clicado11, botao_clicado12, botao_clicado13]
 
-        if all(not botao for botao in botoes_menu) and estado['pagina_atual'] != 'Alunos - Resultados nos simulados':
+        if all(not botao for botao in botoes_menu) and estado['pagina_atual'] != 'Alunos - Resultados nos simulados' and estado['pagina_atual'] != 'Alunos - Presença nas aulas':
             estado['pagina_atual'] = 'Alunos - Gamificação'
             data_hoje_brasilia, hora_atual_brasilia = dia_hora()
             data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
@@ -87,12 +87,12 @@ def mostrar_alunos(nome, permissao, email):
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
             mostrar_gamificacao(nome, permissao, email)
 
-        if botao_clicado10:
+        if botao_clicado10 or estado['pagina_atual'] == 'Alunos - Presença nas aulas':
             estado['pagina_atual'] = 'Alunos - Presença nas aulas'
             data_hoje_brasilia, hora_atual_brasilia = dia_hora()
             data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
-            mostrar_presenca_alunos()
+            mostrar_presenca_aulas(nome, permissao, email)
 
         if botao_clicado11:
             estado['pagina_atual'] = 'Alunos - Engajamento na plataforma'
@@ -119,12 +119,12 @@ def mostrar_alunos(nome, permissao, email):
                     ChangeButtonColour('Resultado nos simulados', 'white', '#ff80e6')
                 with col3:
                     st.write("")
-                    #botao_clicado11 = col3.button('Engajamento na plataforma', key='b11')
-                    #ChangeButtonColour('Engajamento na plataforma', 'white', '#ff80e6')
+                    #botao_clicado10 = col3.button('Presença nas aulas', key='b10')
+                    #ChangeButtonColour('Presença nas aulas', 'white', '#ff80e6')
                 with col4:
                     st.write("")
-                    #botao_clicado10 = col4.button('Presença nas aulas', key='b10')
-                    #ChangeButtonColour('Presença nas aulas', 'white', '#ff80e6')
+                    #botao_clicado11 = col4.button('Engajamento na plataforma', key='b11')
+                    #ChangeButtonColour('Engajamento na plataforma', 'white', '#ff80e6')
                 with col5:
                     st.write("")
 
@@ -135,9 +135,10 @@ def mostrar_alunos(nome, permissao, email):
         unsafe_allow_html=True
         )
 
-        botoes_menu = [botao_clicado12, botao_clicado13]#, botao_clicado11, botao_clicado10, botao_clicado13]
+        botoes_menu = [botao_clicado12, botao_clicado13, botao_clicado10]#, botao_clicado11, botao_clicado10, botao_clicado13]
 
-        if all(not botao for botao in botoes_menu) and estado['pagina_atual'] != 'Alunos - Resultados nos simulados':
+        if all(not botao for botao in botoes_menu) and estado['pagina_atual'] != 'Alunos - Resultados nos simulados' and estado['pagina_atual'] != 'Alunos - Presença nas aulas':
+            
             estado['pagina_atual'] = 'Alunos - Gamificação'
             data_hoje_brasilia, hora_atual_brasilia = dia_hora()
             data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
@@ -152,11 +153,20 @@ def mostrar_alunos(nome, permissao, email):
             mostrar_gamificacao(nome, permissao, email)
 
         elif botao_clicado13 or estado['pagina_atual'] == 'Alunos - Resultados nos simulados':
+
             estado['pagina_atual'] = 'Alunos - Resultados nos simulados'
             data_hoje_brasilia, hora_atual_brasilia = dia_hora()
             data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
             mostrar_resultados_simulados(nome, permissao, email)
+
+        elif botao_clicado10 or estado['pagina_atual'] == 'Alunos - Presença nas aulas':
+
+            estado['pagina_atual'] = 'Alunos - Presença nas aulas'
+            data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+            data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
+            escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+            mostrar_presenca_aulas(nome, permissao, email)
 
         #if botao_clicado10:
         #    estado['pagina_atual'] = 'Alunos - Presença nas aulas'
