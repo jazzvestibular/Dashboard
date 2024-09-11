@@ -119,8 +119,8 @@ def mostrar_alunos(nome, permissao, email):
                     ChangeButtonColour('Resultado nos simulados', 'white', '#ff80e6')
                 with col3:
                     st.write("")
-                    #botao_clicado10 = col3.button('Presença nas aulas', key='b10')
-                    #ChangeButtonColour('Presença nas aulas', 'white', '#ff80e6')
+                    botao_clicado10 = col3.button('Presença nas aulas', key='b10')
+                    ChangeButtonColour('Presença nas aulas', 'white', '#ff80e6')
                 with col4:
                     st.write("")
                     #botao_clicado11 = col4.button('Engajamento na plataforma', key='b11')

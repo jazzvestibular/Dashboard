@@ -78,6 +78,12 @@ def grafico_presenca(dataframe, eixo_x, nome_selecionado):
 
     dataframe_aluno = dataframe[dataframe['Nome do aluno(a)'] == nome_selecionado]
 
+    dataframe_aluno = dataframe_aluno[dataframe_aluno['Presente'] > 0]
+
+    valores_com_presenca = dataframe_aluno[dataframe_aluno['Presente'] != 0][eixo_x].unique()
+
+    media_presenca = dataframe[dataframe[eixo_x].isin(valores_com_presenca)].groupby(eixo_x)['Presente'].mean().reset_index()
+
     # Criando o gráfico de barras
     fig = go.Figure()
 
@@ -92,35 +98,59 @@ def grafico_presenca(dataframe, eixo_x, nome_selecionado):
         texttemplate='<b>%{text:.0f}%</b>',  # Formatando o texto para porcentagem
         textangle=0,
         offsetgroup=nome_selecionado,
-        marker=dict(color='rgba(158, 8, 158, 0.6)', line=dict(color='#FFFFFF', width=2))
+        marker=dict(color='rgba(158, 8, 158, 0.6)', line=dict(color='#FFFFFF', width=2)),
+        hoverinfo='none'
     ))
 
-    if eixo_x == 'Semana':
+    # Mapeando categorias para índices numéricos
+    eixo_x_numerico = {category: idx for idx, category in enumerate(media_presenca[eixo_x])}
 
-        # Atualizando layout
-        fig.update_layout(
-            xaxis_title=eixo_x,
-            yaxis_title='Presença (%)',
-            yaxis_range=[0, 100],  # Definindo o eixo Y de 0 a 100%
-            xaxis_range=[-1, dataframe_aluno['Semana'].max()],  # Definindo o eixo X de 1 ao valor máximo
-            barmode='group',
-            template='plotly_white'
+    # Adicionando linhas horizontais para cada coluna
+    for i in range(len(media_presenca[eixo_x])):
+        # Adiciona uma linha cheia
+        fig.add_shape(
+            type='line',
+            x0=eixo_x_numerico[media_presenca[eixo_x][i]] - 0.2,  # Ajusta a posição para a esquerda da barra
+            x1=eixo_x_numerico[media_presenca[eixo_x][i]] + 0.2,  # Ajusta a posição para a direita da barra
+            y0=media_presenca['Presente'][i] * 100,  # Altura da linha (média para essa coluna)
+            y1=media_presenca['Presente'][i] * 100,  # Mantém a altura da linha
+            line=dict(color='black', width=2)  # Estilo da linha cheia
         )
 
-    if eixo_x == 'Área' or eixo_x == 'Frente' or eixo_x == 'Horário da aula':
-
-        # Atualizando layout
-        fig.update_layout(
-            xaxis_title=eixo_x,
-            yaxis_title='Presença (%)',
-            yaxis_range=[0, 100],  # Definindo o eixo Y de 0 a 100%
-            #xaxis_range=[-1, dataframe['Semana'].max()],  # Definindo o eixo X de 1 ao valor máximo
-            barmode='group',
-            template='plotly_white'
+        # Adiciona o valor da média acima da linha
+        fig.add_annotation(
+            x=eixo_x_numerico[media_presenca[eixo_x][i]],  # Posição X
+            y=media_presenca['Presente'][i] * 100 - 5,  # Posição Y um pouco acima da linha
+            text=f"{media_presenca['Presente'][i] * 100:.1f}%",  # Formata o texto para porcentagem
+            showarrow=False,
+            font=dict(size=12, color="black"),
+            align="center"
         )
+
+    fig.add_trace(
+        go.Scatter(
+            x=media_presenca[eixo_x], 
+            y=media_presenca['Presente'],
+            mode='lines',
+            name='Média',  # Adiciona 'Média' na legenda
+            line=dict(color='black', width=2),  # Linha preta na legenda
+            showlegend=True,  # Mostra a legenda
+            opacity=0  # Linha invisível no gráfico
+        )
+    )
+
+    # Atualizando layout com base no eixo X
+    fig.update_layout(
+        xaxis_title=eixo_x,
+        yaxis_title='Presença (%)',
+        yaxis_range=[0, 100],
+        legend=dict(yanchor="bottom", y=1.1, xanchor="center", x=0.5),  # Posiciona a legenda acima do gráfico
+        barmode='group',
+        template='plotly_white'
+    )
 
     # Exibindo o gráfico no Streamlit
-    st.plotly_chart(fig)
+    st.plotly_chart(fig, use_container_width=True)
 
 def mostrar_presenca_aulas(nome, permissao, email):
 
@@ -149,6 +179,12 @@ def mostrar_presenca_aulas(nome, permissao, email):
 
     presenca_aulas_horario = presenca_aulas2.groupby(['Nome do aluno(a)','Turma','Horário da aula']).mean('Presente').reset_index()
     presenca_aulas_horario = presenca_aulas_horario.sort_values(by = 'Horário da aula', ascending = True)
+
+    presenca_aulas_dia = presenca_aulas2.groupby(['Nome do aluno(a)','Turma','Data']).mean('Presente').reset_index()
+    presenca_aulas_dia['Data'] = pd.to_datetime(presenca_aulas_dia['Data'], errors='coerce')
+    presenca_aulas_dia = presenca_aulas_dia.sort_values(by = 'Data', ascending = True)
+
+    presenca_aulas_media = presenca_aulas2.groupby(['Nome do aluno(a)','Turma']).mean('Presente').reset_index()
     
     if permissao == 'Aluno':
 
@@ -168,21 +204,163 @@ def mostrar_presenca_aulas(nome, permissao, email):
 
         with st.container():
 
-            col1, col2, col3 = st.columns([4,0.5, 4])
+            col4, col5, col6 = st.columns([4,0.1,4])
 
-            with col1:
+            with col4:
+
+                presenca_aulas_aluno = presenca_aulas_media[presenca_aulas_media['Nome do aluno(a)'] == nome_selecionado].reset_index(drop = True)
+
+                st.markdown(
+                    """
+                    <hr style="border: 0px solid #9E089E; margin-bottom: -15px; margin-top: -15px">
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                    """
+                    <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; ">
+                        <strong>Presença nas aulas de 1ª fase</strong>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                        f"""
+                        <div style="background-color: white; color: #9E089E; padding: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; text-align: center; font-size: 36px; margin-bottom: 10px;">
+                            <strong>{"{:.0%}".format(presenca_aulas_aluno['Presente'][0])}</strong>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                st.markdown('<div style="height: 2px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                    f"""
+                    <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; text-align: center;  margin-top: -10px;">
+                        <strong>Média: {"{:.0%}".format(presenca_aulas_media['Presente'].mean())}</strong>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown(
+                    """
+                    <hr style="border: 0px solid #9E089E; margin-top: -1px; ">
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                                        """
+                                        <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center;">
+                                            <strong>Presença por semana</strong>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
 
                 grafico_presenca(presenca_aulas_semanal, 'Semana', nome_selecionado)
 
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                                        """
+                                        <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center;">
+                                            <strong>Presença por horário da aula</strong>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                
                 grafico_presenca(presenca_aulas_horario, 'Horário da aula', nome_selecionado)
 
-            with col3:
+            with col6:
+
+                maior_semana = presenca_aulas_semanal['Semana'].max()
+
+                # Filtrar o DataFrame com base no maior valor
+                presenca_aulas_semanal_ult = presenca_aulas_semanal[presenca_aulas_semanal['Semana'] == maior_semana]
+
+                presenca_aulas_aluno_ult = presenca_aulas_semanal_ult[presenca_aulas_semanal_ult['Nome do aluno(a)'] == nome_selecionado].reset_index(drop = True)
+
+                st.markdown(
+                    """
+                    <hr style="border: 0px solid #9E089E; margin-bottom: -15px; margin-top: -15px">
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                    """
+                    <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; ">
+                        <strong>Presença nas aulas na última semana</strong>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                        f"""
+                        <div style="background-color: white; color: #9E089E; padding: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; text-align: center; font-size: 36px; margin-bottom: 10px;">
+                            <strong>{"{:.0%}".format(presenca_aulas_aluno_ult['Presente'][0])}</strong>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                st.markdown('<div style="height: 2px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                    f"""
+                    <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; text-align: center;  margin-top: -10px;">
+                        <strong>Média: {"{:.0%}".format(presenca_aulas_semanal_ult['Presente'].mean())}</strong>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown(
+                    """
+                    <hr style="border: 0px solid #9E089E; margin-top: -1px; ">
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                                        """
+                                        <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center;">
+                                            <strong>Presença por área</strong>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
 
                 grafico_presenca(presenca_aulas_area, 'Área', nome_selecionado)
 
+                st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                st.markdown(
+                                        """
+                                        <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center;">
+                                            <strong>Presença por frente</strong>
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True
+                                    )
+                
                 grafico_presenca(presenca_aulas_frente, 'Frente', nome_selecionado)
-
-        st.dataframe(presenca_aulas_semanal)
-
-
-
