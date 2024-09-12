@@ -565,7 +565,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
-    alunos = ler_planilha("13ZLdLNHMtkJbo9j39GgK4EovuKyaUb1atXbCjoW40oY", "Streamlit | Alunos!A1:E")
+    alunos = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Alunos!A1:E")
     alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
     alunos = alunos[alunos['Alunos'] != '']
 
