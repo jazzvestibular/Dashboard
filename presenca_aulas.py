@@ -156,6 +156,20 @@ def mostrar_presenca_aulas(nome, permissao, email):
 
     estado = get_estado()
 
+    progress_css = """
+    <style>
+    .progress-bar {
+        background-color: #9e089e;
+    }
+    </style>
+    """
+
+    # Renderizar o CSS personalizado
+    st.markdown(progress_css, unsafe_allow_html=True)
+
+    progress_bar = st.progress(0)
+    percentage_text = st.empty()
+
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
     alunos = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Alunos!A1:E")
@@ -163,7 +177,25 @@ def mostrar_presenca_aulas(nome, permissao, email):
     alunos = alunos[alunos['Alunos'] != '']
     alunos.rename(columns = {'Alunos':'Nome do aluno(a)'}, inplace = True)
 
+    if permissao == 'Aluno':
+
+        nome_selecionado = nome
+    
+    else:
+
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Nome do aluno(a)'].unique())
+
+        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
+
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
+        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
     presenca_aulas = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas!A1:Y")
+
+    progress_bar.progress(50)
+    percentage_text.text("50%")
+
     #presenca_aulas['Pontuação_Presença_Aulas'] = presenca_aulas['Pontuação'].fillna(0).astype(int)
     presenca_aulas['Presente'] = presenca_aulas['Presente'].fillna(0).astype(int)
     
@@ -185,20 +217,9 @@ def mostrar_presenca_aulas(nome, permissao, email):
     presenca_aulas_dia = presenca_aulas_dia.sort_values(by = 'Data', ascending = True)
 
     presenca_aulas_media = presenca_aulas2.groupby(['Nome do aluno(a)','Turma']).mean('Presente').reset_index()
-    
-    if permissao == 'Aluno':
 
-        nome_selecionado = nome
-    
-    else:
-
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Nome do aluno(a)'].unique())
-
-        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
-
-        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
-        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
-        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+    progress_bar.progress(100)
+    percentage_text.text("100%")
 
     if nome_selecionado != "Escolha o(a) aluno(a)":
 

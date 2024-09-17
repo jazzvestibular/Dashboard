@@ -561,6 +561,23 @@ def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibu
     
 def mostrar_resultados_simulados(nome, permissao, email):
 
+    import time
+    start_time = time.time()
+
+    progress_css = """
+    <style>
+    .progress-bar {
+        background-color: #9e089e;
+    }
+    </style>
+    """
+
+    # Renderizar o CSS personalizado
+    st.markdown(progress_css, unsafe_allow_html=True)
+
+    progress_bar = st.progress(0)
+    percentage_text = st.empty()
+
     estado = get_estado()
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
@@ -569,36 +586,96 @@ def mostrar_resultados_simulados(nome, permissao, email):
     alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
     alunos = alunos[alunos['Alunos'] != '']
 
-    #### BASES INSPER
+    if permissao == 'Aluno':
 
-    base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
-    base_redacao_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 02!A1:I22000")
-    base_redacao_insper = pd.concat([base_redacao_insper1, base_redacao_insper2], axis=0).reset_index()
+        nome_selecionado = nome
+    
+    else:
+
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Alunos'].unique())
+
+        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos, key = 'Aluno')
+
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
+        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
+    progress_bar.progress(0.05)
+    percentage_text.text("5%")
+
+    #### BASES INSPER
 
     base_resultados_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Matemática Básica!A1:I3000")
 
-    base_matriz_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Matemática Básica!A1:G1000")
+    progress_bar.progress(0.10)
+    percentage_text.text("10%")
 
     base_resultados_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:I4000")
-    base_resultados_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 02!A1:I4000")
-    base_resultados_insper = pd.concat([base_resultados_insper1, base_resultados_insper2], axis=0).reset_index()
 
-    base_matriz_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:G1000")
-    base_matriz_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 02!A1:G1000")
-    base_matriz_insper = pd.concat([base_matriz_insper1, base_matriz_insper2], axis=0).reset_index()
+    progress_bar.progress(0.15)
+    percentage_text.text("15%")
+
+    base_resultados_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 02!A1:I4000")
+
+    progress_bar.progress(0.20)
+    percentage_text.text("20%")
+
+    base_resultados_insper = pd.concat([base_resultados_insper1, base_resultados_insper2], axis=0).reset_index()
 
     ### BASES FGV
 
     base_resultados_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 01!A1:I4000")
-    base_resultados_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:I4000")
-    base_resultados_fgv = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0).reset_index()
 
+    progress_bar.progress(0.25)
+    percentage_text.text("25%")
+    
+    base_resultados_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:I4000")
+
+    progress_bar.progress(0.30)
+    percentage_text.text("30%")
+    
+    base_resultados_fgv = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0).reset_index()
+    
+    base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
+    
+    base_resultados_aux = base_resultados_aux.drop(columns = ['level_0'])
+
+    base_resultados = pd.concat([base_resultados_aux, base_resultados_fgv], axis=0).reset_index()
+
+    simulados = ["Escolha o simulado"] + sorted(base_resultados['Simulado'].drop_duplicates().sort_values().unique())
+
+    simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
+
+    base_matriz_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Matemática Básica!A1:G1000")
+
+    base_matriz_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:G1000")
+
+    base_matriz_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 02!A1:G1000")
+
+    progress_bar.progress(0.35)
+    percentage_text.text("35%")
+
+    base_matriz_insper = pd.concat([base_matriz_insper1, base_matriz_insper2], axis=0).reset_index()
+    
     base_matriz_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 01!A1:G1000")
+
     base_matriz_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 02!A1:G61")
+
+    progress_bar.progress(0.40)
+    percentage_text.text("40%")
+
     base_matriz_fgv = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0).reset_index()
+    
+    base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
+    
+    base_redacao_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 02!A1:I22000")
+
+    progress_bar.progress(0.45)
+    percentage_text.text("45%")
+    
+    base_redacao_insper = pd.concat([base_redacao_insper1, base_redacao_insper2], axis=0).reset_index()
 
     base_redacao_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação | FGV!A1:I22000")
-
 
     turma_eng12 = 'Engenharias e Ciência da Computação'
     turma_cien12 = 'Engenharias e Ciência da Computação'
@@ -619,10 +696,6 @@ def mostrar_resultados_simulados(nome, permissao, email):
     turma_eco2 = 'Administração, Economia e Direito'
     turma_dir2 = 'Administração, Economia e Direito'
 
-    base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
-    base_resultados_aux = base_resultados_aux.drop(columns = ['level_0'])
-    base_resultados = pd.concat([base_resultados_aux, base_resultados_fgv], axis=0).reset_index()
-
     base_matriz_aux = pd.concat([base_matriz_matbasica, base_matriz_insper], axis=0).reset_index()
     base_matriz_aux = base_matriz_aux.drop(columns = ['level_0'])
     base_matriz = pd.concat([base_matriz_aux, base_matriz_fgv], axis=0).reset_index()
@@ -634,33 +707,10 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     bar_color = '#9E089E'
 
-    progress_css = """
-    <style>
-    .progress-bar {
-        background-color: #9e089e;
-    }
-    </style>
-    """
+    end_time = time.time()
+    elapsed_time = end_time - start_time
 
-    # Renderizar o CSS personalizado
-    st.markdown(progress_css, unsafe_allow_html=True)
-
-    progress_bar = st.progress(0)
-    percentage_text = st.empty()
-
-    if permissao == 'Aluno':
-
-        nome_selecionado = nome
-    
-    else:
-
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Alunos'].unique())
-
-        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
-
-        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
-        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
-        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+    #st.write(elapsed_time)
 
     #if permissao == 'Aluno':
 
@@ -682,12 +732,13 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         #login_aluno = st.text_input('Digite o seu login', '')
 
-    simulados = ["Escolha o simulado"] + sorted(base_resultados['Simulado'].drop_duplicates().sort_values().unique())
-
-    simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
-
     base_resultados_simu_selecionado = base_resultados[base_resultados['Simulado'] == simulado_selecionado]
     base_resultados_simu_selecionado = base_resultados_simu_selecionado[base_resultados_simu_selecionado['num_exercicio'] != "73"].reset_index(drop = True) 
+
+    if (nome_selecionado == 'Escolha o(a) aluno(a)' or simulado_selecionado == 'Escolha o simulado'):
+
+        progress_bar.progress(1.00)
+        percentage_text.text("100%")
 
     if (nome_selecionado != 'Escolha o(a) aluno(a)' and simulado_selecionado != 'Escolha o simulado'):
 
@@ -719,8 +770,8 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 base_resultados_simu_selecionado['Assunto'][i] = matriz_questoes['assunto'][0]
 
             # Atualizando a barra de progresso e o componente de texto a cada iteração
-            progress_bar.progress((i + 1) / len(base_resultados_simu_selecionado['atividade_nome']))
-            percentage_text.text(f"{round((i + 1) / len(base_resultados_simu_selecionado['atividade_nome']) * 100)}%")
+            progress_bar.progress(((i + 1) / len(base_resultados_simu_selecionado['atividade_nome']))/2 + 0.5)
+            percentage_text.text(f"{round(((i + 1) / len(base_resultados_simu_selecionado['atividade_nome'])) * 100/2 + 50)}%")
 
         # Removendo a barra de progresso e o componente de texto no final do loop
         st.empty()

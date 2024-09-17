@@ -554,6 +554,9 @@ def grafico_pontuacao_semanal(gamificacao, nome_selecionado, esferas_selecionada
 
 def mostrar_gamificacao(nome, permissao, email):
 
+    import time
+    start_time = time.time()
+
     estado = get_estado()
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
@@ -563,15 +566,94 @@ def mostrar_gamificacao(nome, permissao, email):
     alunos = alunos[alunos['Alunos'] != '']
     alunos.rename(columns = {'Alunos':'Nome do aluno(a)'}, inplace = True)
 
-    engajamento_plataforma = ler_planilha("12T-TRAZsGYGqnYjbn-K_PZrme-ygyUWJSfuR-LQ0JT8", "Streamlit | Engajamento na plataforma!A1:J")
+    if permissao == 'Aluno':
+
+        nome_selecionado = nome
+    
+    else:
+
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Nome do aluno(a)'].unique())
+
+        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
+
+        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
+        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+
+    progress = st.progress(0)
+    percentage_text = st.empty()
+
+    def update_progress(value):
+        progress.progress(value)
+        percentage_text.text(f"{round((value))}%")
+
     presenca_aulasMT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(10)
+
     presenca_aulasT2 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(20)
+
     presenca_aulasNT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(30)
+
+    engajamento_plataforma = ler_planilha("12T-TRAZsGYGqnYjbn-K_PZrme-ygyUWJSfuR-LQ0JT8", "Streamlit | Engajamento na plataforma!A1:J")
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(40)
+    
     presenca_aulas_aux = pd.concat([presenca_aulasT2, presenca_aulasMT1], axis=0)
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(50)
+    
     presenca_aulas = pd.concat([presenca_aulas_aux, presenca_aulasNT1], axis=0)
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(60)
+
     presenca_mentoria = ler_planilha("1EEzqMd2uBnL5-7-19FhYS3w_s_wVa21s0TN_2wPHUdk", "Streamlit | Presença na mentoria!A1:F")
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(70)
+
     presenca_nota_simulado = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Streamlit | Presença + Notas simulado!A1:R")
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(80)
+
     duvidas_monitoria = ler_planilha("1SCYS-8FccRCvK18CMqMGFWpTKRlDgzBGAaG26dBsWCg", "Streamlit | Monitoria!A1:O")
+    
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    #st.write(elapsed_time)
+    update_progress(90)
+    
     presenca_aulas_2fase = ler_planilha("13AsGUjRUBaachB_9Zjq_-4G7xcxyWFvJtI_0XmF5zfg", "Streamlit | Presença nas aulas | 2ª fase!A1:G10000")
 
     engajamento_plataforma['Pontuação_Engajamento_Plataforma'] = engajamento_plataforma['Pontuação'].fillna(0).astype(int)
@@ -650,28 +732,21 @@ def mostrar_gamificacao(nome, permissao, email):
 
     presenca_aulas_2fase2 = presenca_aulas_2fase.groupby(['Nome do aluno(a)','Turma']).agg({'Pontuação_Presença_2Fase': 'sum'}).reset_index()
 
-    if permissao == 'Aluno':
+    if nome_selecionado == 'Escolha o(a) aluno(a)':
 
-        nome_selecionado = nome
-    
-    else:
-
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Nome do aluno(a)'].unique())
-
-        nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
-
-        data_hoje_brasilia, hora_atual_brasilia = dia_hora()
-        data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
-        escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        #st.write(elapsed_time)
+        update_progress(100)
 
     if nome_selecionado != "Escolha o(a) aluno(a)":
 
-        engajamento_plataforma_aluno = engajamento_plataforma[engajamento_plataforma['Nome do aluno(a)'] == nome_selecionado]
-        presenca_aulas_aluno = presenca_aulas[presenca_aulas['Nome do aluno(a)'] == nome_selecionado]
-        presenca_mentoria_aluno = presenca_mentoria[presenca_mentoria['Nome do aluno(a)'] == nome_selecionado]
-        presenca_nota_simulado_aluno = presenca_nota_simulado[presenca_nota_simulado['Nome do aluno(a)'] == nome_selecionado]
-        duvidas_monitoria_aluno = duvidas_monitoria[duvidas_monitoria['Nome do aluno(a)'] == nome_selecionado]
-        presenca_aulas_2fase_aluno = presenca_aulas_2fase[presenca_aulas_2fase['Nome do aluno(a)'] == nome_selecionado]
+        #engajamento_plataforma_aluno = engajamento_plataforma[engajamento_plataforma['Nome do aluno(a)'] == nome_selecionado]
+        #presenca_aulas_aluno = presenca_aulas[presenca_aulas['Nome do aluno(a)'] == nome_selecionado]
+        #presenca_mentoria_aluno = presenca_mentoria[presenca_mentoria['Nome do aluno(a)'] == nome_selecionado]
+        #presenca_nota_simulado_aluno = presenca_nota_simulado[presenca_nota_simulado['Nome do aluno(a)'] == nome_selecionado]
+        #duvidas_monitoria_aluno = duvidas_monitoria[duvidas_monitoria['Nome do aluno(a)'] == nome_selecionado]
+        #presenca_aulas_2fase_aluno = presenca_aulas_2fase[presenca_aulas_2fase['Nome do aluno(a)'] == nome_selecionado]
 
         #engajamento_plataforma_aluno2 = engajamento_plataforma_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
         #presenca_aulas_aluno2 = presenca_aulas_aluno.groupby(['Nome do aluno(a)','Turma']).sum().reset_index()
@@ -732,7 +807,7 @@ def mostrar_gamificacao(nome, permissao, email):
             gamificacao_final['Pontuação_Duvidas_Monitoria'].max() == 0, 
             0, 
             gamificacao_final['Pontuação_Duvidas_Monitoria'] / gamificacao_final['Pontuação_Duvidas_Monitoria'].max()
-        )
+        )       
 
         gamificacao3 = gamificacao_final.sort_values(by = 'Pontuação', ascending = False)
         gamificacao3 = gamificacao3[gamificacao3['Pontuação'] >= 0]
@@ -748,7 +823,6 @@ def mostrar_gamificacao(nome, permissao, email):
         
         gamificacao3_medias.columns = ['Métrica', 'Média']
         pontuacao_aluno = gamificacao3_aluno['Pontuação'][0]
-        
 
         pontuacao_media = gamificacao3['Pontuação'].mean().round(0).astype(int)
 
@@ -756,6 +830,11 @@ def mostrar_gamificacao(nome, permissao, email):
         nivel_aluno2 = int(nivel_aluno[0])
 
         st.markdown('<div style="height: 0px;"></div>', unsafe_allow_html=True)
+
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        #st.write(elapsed_time)
+        update_progress(100)
 
         with st.container():
 
