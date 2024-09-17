@@ -225,7 +225,7 @@ def mostrar_presenca_aulas(nome, permissao, email):
 
         with st.container():
 
-            col4, col5, col6 = st.columns([4,0.1,4])
+            col4, col5, col6, col7 = st.columns([4,0.1,4,0.1])
 
             with col4:
 
