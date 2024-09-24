@@ -586,7 +586,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
     alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
     alunos = alunos[alunos['Alunos'] != '']
 
-    if permissao == 'Aluno':
+    if (permissao == 'Aluno' or permissao == 'Responsável'):
 
         nome_selecionado = nome
     
@@ -634,10 +634,14 @@ def mostrar_resultados_simulados(nome, permissao, email):
     
     base_resultados_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:I4000")
 
+    base_resultados_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 03!A1:I4000")
+
     progress_bar.progress(0.30)
     percentage_text.text("30%")
     
-    base_resultados_fgv = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0).reset_index()
+    base_resultados_fgv_aux = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0)
+
+    base_resultados_fgv = pd.concat([base_resultados_fgv_aux, base_resultados_fgv3], axis=0).reset_index()
     
     base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
     
@@ -668,10 +672,14 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     base_matriz_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 02!A1:G61")
 
+    base_matriz_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 03!A1:G61")
+
     progress_bar.progress(0.40)
     percentage_text.text("40%")
 
-    base_matriz_fgv = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0).reset_index()
+    base_matriz_fgv_aux = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0)
+
+    base_matriz_fgv = pd.concat([base_matriz_fgv_aux, base_matriz_fgv3], axis=0).reset_index()
     
     base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
     
@@ -887,7 +895,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         if "FGV" in simulado_selecionado:
 
-            cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'FGV Total')
+            cards_principais(int(round(0.8*resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(0.8*resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'FGV Total')
 
         if "Matemática" in simulado_selecionado:
 
