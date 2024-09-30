@@ -619,11 +619,14 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     base_resultados_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 03!A1:I4000")
 
+    base_resultados_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 04!A1:I4000")
+
     progress_bar.progress(0.20)
     percentage_text.text("20%")
 
     base_resultados_insper_aux = pd.concat([base_resultados_insper1, base_resultados_insper2], axis=0)#.reset_index()
-    base_resultados_insper = pd.concat([base_resultados_insper_aux, base_resultados_insper3], axis=0).reset_index()
+    base_resultados_insper_aux2 = pd.concat([base_resultados_insper_aux, base_resultados_insper3], axis=0)
+    base_resultados_insper = pd.concat([base_resultados_insper_aux2, base_resultados_insper4], axis=0).reset_index()
 
     ### BASES FGV
 
@@ -661,12 +664,14 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     base_matriz_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 03!A1:G1000")
 
+    base_matriz_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 04!A1:G1000")
+
     progress_bar.progress(0.35)
     percentage_text.text("35%")
 
     base_matriz_insper_aux = pd.concat([base_matriz_insper1, base_matriz_insper2], axis=0)#.reset_index()
-
-    base_matriz_insper = pd.concat([base_matriz_insper_aux, base_matriz_insper3], axis=0).reset_index()
+    base_matriz_insper_aux2 = pd.concat([base_matriz_insper_aux, base_matriz_insper3], axis=0)
+    base_matriz_insper = pd.concat([base_matriz_insper_aux2, base_matriz_insper4], axis=0).reset_index()
     
     base_matriz_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 01!A1:G1000")
 
@@ -687,12 +692,14 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     base_redacao_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 03!A1:I22000")
 
+    base_redacao_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 04!A1:I22000")
+
     progress_bar.progress(0.45)
     percentage_text.text("45%")
     
     base_redacao_insper_aux = pd.concat([base_redacao_insper1, base_redacao_insper2], axis=0)#.reset_index()
-
-    base_redacao_insper = pd.concat([base_redacao_insper_aux, base_redacao_insper3], axis=0).reset_index()
+    base_redacao_insper_aux2 = pd.concat([base_redacao_insper_aux, base_redacao_insper3], axis=0)
+    base_redacao_insper = pd.concat([base_redacao_insper_aux2, base_redacao_insper4], axis=0).reset_index()
 
     base_redacao_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação | FGV!A1:I22000")
 
