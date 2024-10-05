@@ -87,6 +87,10 @@ def grafico_presenca(dataframe, eixo_x, nome_selecionado):
     # Criando o gráfico de barras
     fig = go.Figure()
 
+    if nome_selecionado == 'Maria Eduarda Mariano':
+        
+        nome_selecionado = 'Aluno exemplo'
+
     # Adicionando as barras
     fig.add_trace(go.Bar(
         name=nome_selecionado,
@@ -172,12 +176,12 @@ def mostrar_presenca_aulas(nome, permissao, email):
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
-    alunos = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Alunos!A1:E")
+    alunos = ler_planilha("1ZyRboIm7Bf2P-sUroxIxidWsnX7ADFDdIN8Ck1Sdp0s", "Streamlit | Alunos!A1:E")
     alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
     alunos = alunos[alunos['Alunos'] != '']
     alunos.rename(columns = {'Alunos':'Nome do aluno(a)'}, inplace = True)
 
-    if permissao == 'Aluno':
+    if (permissao == 'Aluno' or permissao == 'Responsável'):
 
         nome_selecionado = nome
     
