@@ -605,21 +605,24 @@ def mostrar_gamificacao(nome, permissao, email):
         progress.progress(value)
         percentage_text.text(f"{round((value))}%")
 
-    presenca_aulasMT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
-    
+    presenca_aulasMT1 = ler_planilha("122UPTJRh0PmjezG64b8gdFtKftycXaprcytTSbwX-dg", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
+    #presenca_aulasMT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
+
     end_time = time.time()
     elapsed_time = end_time - start_time
     #st.write(elapsed_time)
     update_progress(10)
 
-    presenca_aulasT2 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
+    presenca_aulasT2 = ler_planilha("1qV-TL1B26Xhrmg7w5JkO6RPRSlaD3Li3saeBRtQZJD0", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
+    #presenca_aulasT2 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 2!A1:R")
     
     end_time = time.time()
     elapsed_time = end_time - start_time
     #st.write(elapsed_time)
     update_progress(20)
 
-    presenca_aulasNT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
+    presenca_aulasNT1 = ler_planilha("10ocwUa69s-3c_FMpNMWq6CRooGooa0-9K19rFwm8oEo", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
+    #presenca_aulasNT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
 
     end_time = time.time()
     elapsed_time = end_time - start_time
