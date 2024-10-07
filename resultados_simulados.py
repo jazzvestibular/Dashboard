@@ -639,12 +639,16 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     base_resultados_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 03!A1:I4000")
 
+    base_resultados_fgv4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 04!A1:I4000")
+
     progress_bar.progress(0.30)
     percentage_text.text("30%")
     
     base_resultados_fgv_aux = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0)
 
-    base_resultados_fgv = pd.concat([base_resultados_fgv_aux, base_resultados_fgv3], axis=0).reset_index()
+    base_resultados_fgv_aux2 = pd.concat([base_resultados_fgv_aux, base_resultados_fgv3], axis=0)
+
+    base_resultados_fgv = pd.concat([base_resultados_fgv_aux2, base_resultados_fgv4], axis=0).reset_index()
     
     base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
     
@@ -679,12 +683,16 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     base_matriz_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 03!A1:G61")
 
+    base_matriz_fgv4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 04!A1:G61")
+
     progress_bar.progress(0.40)
     percentage_text.text("40%")
 
     base_matriz_fgv_aux = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0)
 
-    base_matriz_fgv = pd.concat([base_matriz_fgv_aux, base_matriz_fgv3], axis=0).reset_index()
+    base_matriz_fgv_aux2 = pd.concat([base_matriz_fgv_aux, base_matriz_fgv3], axis=0)
+
+    base_matriz_fgv = pd.concat([base_matriz_fgv_aux2, base_matriz_fgv4], axis=0).reset_index()
     
     base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
     
