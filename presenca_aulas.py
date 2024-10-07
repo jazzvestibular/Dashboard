@@ -87,10 +87,6 @@ def grafico_presenca(dataframe, eixo_x, nome_selecionado):
     # Criando o gráfico de barras
     fig = go.Figure()
 
-    if nome_selecionado == 'Maria Eduarda Mariano':
-        
-        nome_selecionado = 'Aluno exemplo'
-
     # Adicionando as barras
     fig.add_trace(go.Bar(
         name=nome_selecionado,

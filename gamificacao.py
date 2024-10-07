@@ -475,20 +475,7 @@ def tabela_pontuacoes(gamificacao, nome_selecionado):
                     background_color = 'rgba(255, 255, 255, 1)'
                     font_color = '#000000'
 
-                if row['Nome do aluno(a)'] == 'Maria Eduarda Mariano':
-
-                    st.markdown(f"""
-                    <tr style="text-align: center; background-color: {background_color}; color: {font_color};">
-                        <td style="width: 300px; min-width: 300px; max-width: 300px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">Aluno exemplo</td>
-                        <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Turma']}</td>
-                        <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Nível']}</td>
-                        <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Pontuação selecionada']}</td>
-                    </tr>
-                    """, unsafe_allow_html=True)
-
-                else:
-
-                    st.markdown(f"""
+                st.markdown(f"""
                     <tr style="text-align: center; background-color: {background_color}; color: {font_color};">
                         <td style="width: 300px; min-width: 300px; max-width: 300px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Nome do aluno(a)']}</td>
                         <td style="width: 150px; min-width: 150px; max-width: 150px; text-align: center; border-bottom: 1px solid #FFFFFF; padding: 10px; height: 40px; border-left: 1px solid white; border-right: 1px solid white;">{row['Turma']}</td>
@@ -859,20 +846,7 @@ def mostrar_gamificacao(nome, permissao, email):
 
             with col2:
 
-                if nome_selecionado == 'Maria Eduarda Mariano':
-
-                    st.markdown(
-                                        f"""
-                                        <div style="background-color: #9E089E; color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; text-align: center; font-size: 45px;">
-                                            <strong>Aluno exemplo</strong>
-                                        </div>
-                                        """,
-                                        unsafe_allow_html=True
-                                    )
-                
-                else:
-
-                    st.markdown(
+                st.markdown(
                                         f"""
                                         <div style="background-color: #9E089E; color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; text-align: center; font-size: 45px;">
                                             <strong>{nome_selecionado.upper()}</strong>
