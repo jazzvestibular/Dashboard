@@ -608,7 +608,7 @@ def mostrar_gamificacao(nome, permissao, email):
     #st.write(elapsed_time)
     update_progress(20)
 
-    presenca_aulasNT1 = ler_planilha("10ocwUa69s-3c_FMpNMWq6CRooGooa0-9K19rFwm8oEo", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
+    #presenca_aulasNT1 = ler_planilha("10ocwUa69s-3c_FMpNMWq6CRooGooa0-9K19rFwm8oEo", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
     #presenca_aulasNT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Tarde 1 (Nat)!A1:R")
 
     end_time = time.time()
@@ -630,7 +630,8 @@ def mostrar_gamificacao(nome, permissao, email):
     #st.write(elapsed_time)
     update_progress(50)
     
-    presenca_aulas = pd.concat([presenca_aulas_aux, presenca_aulasNT1], axis=0)
+    presenca_aulas = presenca_aulas_aux
+    #presenca_aulas = pd.concat([presenca_aulas_aux, presenca_aulasNT1], axis=0)
     
     end_time = time.time()
     elapsed_time = end_time - start_time
