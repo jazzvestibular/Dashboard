@@ -59,7 +59,7 @@ def mostrar_formulario_login():
     st.markdown(html_br, unsafe_allow_html=True)
 
     col4, col5, col6 = st.columns([9, 1, 10])
-
+    st.write('Entrei01')
     entrar_button = col5.button('Entrar', key='b20')
     ChangeButtonColour('Entrar', 'white', '#9E089E')
 
