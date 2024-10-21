@@ -78,9 +78,10 @@ def mostrar_formulario_login():
             if senha == senha_correspondente:
                 st.session_state.logged_in = True
                 st.success("Login bem-sucedido! Você pode acessar seu conteúdo aqui.")
+                st.write('Entrei')
 
                 if tabela_usuarios.loc[indice_email, "Permissão"] != 'Responsável':
-                    st.write('Entrei')
+                    st.write('Entrei2')
                     return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Nome"], tabela_usuarios.loc[indice_email, "Email"]
                 else:
                     return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Aluno (responsável)"], tabela_usuarios.loc[indice_email, "Email"]
