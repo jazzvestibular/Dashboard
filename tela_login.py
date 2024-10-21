@@ -76,9 +76,11 @@ def mostrar_formulario_login():
             st.write('Entrei02')
 
             indice_email = lista_emails.index(email)  
-            senha_correspondente = tabela_usuarios.loc[indice_email, "Senha"]  
+            senha_correspondente = tabela_usuarios.loc[indice_email, "Senha"]
+
 
             if senha == senha_correspondente:
+                st.write('Entrei 03')
                 st.session_state.logged_in = True
                 st.success("Login bem-sucedido! Você pode acessar seu conteúdo aqui.")
                 st.write('Entrei2')
