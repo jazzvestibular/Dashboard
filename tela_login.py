@@ -129,9 +129,9 @@ def mostrar_tela_login():
             st.session_state.nome_usuario = nome_usuario
             st.session_state.Email = Email
             i = 0
-            if i == 0:
-                st.experimental_rerun()
-                i = i + 1
+            #if i == 0:
+            #    st.experimental_rerun()
+            #    i = i + 1
             return True, st.session_state.tipo_usuario, st.session_state.nome_usuario, st.session_state.Email
         
         return False, "Sem Permissão", "Sem Nome", "Sem Email"
