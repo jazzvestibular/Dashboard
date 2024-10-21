@@ -66,12 +66,14 @@ def mostrar_formulario_login():
     tabela_usuarios = ler_planilha2("1YxmzHU3AWA_SVoRDX7n8AQmLMravj093Wtzsuvkuo3M", "Lista de usuários | Streamlit | Tabela permissões!A1:E1000")
     st.dataframe(tabela_usuarios)
     lista_emails = tabela_usuarios["Email"].tolist()
+    st.write(lista_emails)
 
     if entrar_button:
         st.write('Entrei')
         email = email.lower()  
 
         if email in lista_emails:
+            st.write('Entrei02')
 
             indice_email = lista_emails.index(email)  
             senha_correspondente = tabela_usuarios.loc[indice_email, "Senha"]  
