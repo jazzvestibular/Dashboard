@@ -123,6 +123,7 @@ def mostrar_tela_login():
     if not st.session_state.logged_in:
         st.write('Entrei0')
         login_ok, tipo_usuario, nome_usuario, Email = mostrar_formulario_login()
+        st.write('Entrei04')
         if login_ok:
             st.session_state.tipo_usuario = tipo_usuario
             st.session_state.nome_usuario = nome_usuario
