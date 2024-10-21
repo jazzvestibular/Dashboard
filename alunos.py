@@ -135,7 +135,7 @@ def mostrar_alunos(nome, permissao, email):
         unsafe_allow_html=True
         )
 
-        botoes_menu = [botao_clicado12, botao_clicado13, botao_clicado10]#, botao_clicado11, botao_clicado10, botao_clicado13]
+        botoes_menu = [botao_clicado12, botao_clicado13]#, botao_clicado10]#, botao_clicado11, botao_clicado10, botao_clicado13]
 
         if all(not botao for botao in botoes_menu) and estado['pagina_atual'] != 'Alunos - Resultados nos simulados' and estado['pagina_atual'] != 'Alunos - Presença nas aulas':
             
