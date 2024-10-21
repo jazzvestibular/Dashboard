@@ -152,12 +152,12 @@ def mostrar_alunos(nome, permissao, email):
             escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
             mostrar_gamificacao(nome, permissao, email)
 
-        elif botao_clicado10:
-            estado['pagina_atual'] = 'Alunos - Presença nas aulas'
-            data_hoje_brasilia, hora_atual_brasilia = dia_hora()
-            data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
-            escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
-            mostrar_presenca_aulas(nome, permissao, email)
+        #elif botao_clicado10:
+        #    estado['pagina_atual'] = 'Alunos - Presença nas aulas'
+        #    data_hoje_brasilia, hora_atual_brasilia = dia_hora()
+        #    data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", "", email]]
+        #    escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
+        #    mostrar_presenca_aulas(nome, permissao, email)
 
         elif botao_clicado13 or estado['pagina_atual'] == 'Alunos - Resultados nos simulados':
             estado['pagina_atual'] = 'Alunos - Resultados nos simulados'
