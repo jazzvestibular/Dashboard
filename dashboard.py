@@ -251,10 +251,6 @@ from tela_login import mostrar_tela_login
 if __name__ == "__main__":
     
     login, permissao, nome, email = mostrar_tela_login()
-    st.write(login)
-    st.write(permissao)
-    st.write(nome)
-    st.write(email)
     if login:
         mostrar_botoes(permissao, nome, email)
         if get_estado()['pagina_atual'] == 'Página Inicial':

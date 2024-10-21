@@ -59,34 +59,34 @@ def mostrar_formulario_login():
     st.markdown(html_br, unsafe_allow_html=True)
 
     col4, col5, col6 = st.columns([9, 1, 10])
-    st.write('Entrei01')
+    #st.write('Entrei01')
     entrar_button = col5.button('Entrar', key='b20')
     ChangeButtonColour('Entrar', 'white', '#9E089E')
 
     tabela_usuarios = ler_planilha2("1YxmzHU3AWA_SVoRDX7n8AQmLMravj093Wtzsuvkuo3M", "Lista de usuários | Streamlit | Tabela permissões!A1:E1000")
-    st.dataframe(tabela_usuarios)
+    #st.dataframe(tabela_usuarios)
     lista_emails = tabela_usuarios["Email"].tolist()
-    st.write(lista_emails)
+    #st.write(lista_emails)
 
     if entrar_button:
-        st.write('Entrei')
+        #st.write('Entrei')
         email = email.lower()  
 
         if email in lista_emails:
-            st.write('Entrei02')
+            #st.write('Entrei02')
 
             indice_email = lista_emails.index(email)  
             senha_correspondente = tabela_usuarios.loc[indice_email, "Senha"]
 
 
             if senha == senha_correspondente:
-                st.write('Entrei 03')
+                #st.write('Entrei 03')
                 st.session_state.logged_in = True
                 st.success("Login bem-sucedido! Você pode acessar seu conteúdo aqui.")
-                st.write('Entrei2')
+                #st.write('Entrei2')
 
                 if tabela_usuarios.loc[indice_email, "Permissão"] != 'Responsável':
-                    st.write('Entrei3')
+                    #st.write('Entrei3')
                     return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Nome"], tabela_usuarios.loc[indice_email, "Email"]
                 else:
                     return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Aluno (responsável)"], tabela_usuarios.loc[indice_email, "Email"]
@@ -121,17 +121,17 @@ def mostrar_tela_login():
         return True, tipo_usuario, nome_usuario, Email
 
     if not st.session_state.logged_in:
-        st.write('Entrei0')
+        #st.write('Entrei0')
         login_ok, tipo_usuario, nome_usuario, Email = mostrar_formulario_login()
-        st.write('Entrei04')
+        #st.write('Entrei04')
         if login_ok:
             st.session_state.tipo_usuario = tipo_usuario
             st.session_state.nome_usuario = nome_usuario
             st.session_state.Email = Email
             i = 0
-            #if i == 0:
-            #    st.experimental_rerun()
-            #    i = i + 1
+            if i == 0:
+                st.experimental_rerun()
+                i = i + 1
             return True, st.session_state.tipo_usuario, st.session_state.nome_usuario, st.session_state.Email
         
         return False, "Sem Permissão", "Sem Nome", "Sem Email"
