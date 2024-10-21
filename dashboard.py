@@ -7,7 +7,7 @@ st.set_option('client.caching', False)
 import streamlit.components.v1 as components
 from alunos import mostrar_alunos
 from professores import mostrar_professores
-from mentoria_antes import mostrar_mentoria
+#from mentoria_antes import mostrar_mentoria
 from logs import escrever_planilha
 import datetime
 import pytz
