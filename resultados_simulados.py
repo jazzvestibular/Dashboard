@@ -355,7 +355,7 @@ def tabela_questoes(df):
             </tr>
             """, unsafe_allow_html=True)
 
-def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibular):
+def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibular, classificacao_aluno, total_alunos):
 
     with st.container():
             col1, col2, col3, col4, col5, col6, col7 = st.columns([1,20,1,20,1,20,1])
@@ -446,7 +446,7 @@ def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibu
                             unsafe_allow_html=True
                         )
 
-                    if vestibular == 'Insper':
+                    if vestibular == 'Insper' or vestibular == 'Simulado Nacional Insper 1ª fase':
 
                         st.markdown(
                             f"""
@@ -457,7 +457,7 @@ def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibu
                             unsafe_allow_html=True
                         )
 
-                    if vestibular == 'Insper Total':
+                    if vestibular == 'Insper Total' or vestibular == 'Simulado Nacional Insper 1ª fase Total':
 
                         st.markdown(
                             f"""
@@ -555,10 +555,195 @@ def cards_principais(nota_aluno, nota_media, acerto_aluno, acerto_media, vestibu
             with col5:
                 st.write("")
             with col6:
-                st.write("")
+
+                if nota_aluno != 0:
+
+                    if vestibular == 'Simulado Nacional Insper 1ª fase' or vestibular == 'Simulado Nacional Insper 1ª fase Total':
+
+                        st.markdown(
+                        """
+                        <hr style="border: 0px solid #9E089E; margin-bottom: -15px; margin-top: -15px">
+                        """,
+                        unsafe_allow_html=True
+                        )
+
+                        st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                        st.markdown(
+                            """
+                            <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; ">
+                                <strong>Classificação</strong>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+                        st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+                        st.markdown(
+                            f"""
+                            <div style="background-color: white; color: #9E089E; padding: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; text-align: center; font-size: 36px; margin-bottom: 10px;">
+                                <strong>{classificacao_aluno}</strong>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+                        st.markdown('<div style="height: 2px;"></div>', unsafe_allow_html=True)
+
+                        st.markdown(
+                            f"""
+                            <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; text-align: center;  margin-top: -10px;">
+                                <strong>Total: {total_alunos}</strong>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+                        st.markdown(
+                            """
+                            <hr style="border: 0px solid #9E089E; margin-top: -1px; ">
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+                    else:
+                        st.write("")
             with col7:
                 st.write("")
+
+def criar_histograma_acertos(resultados, nome_aluno, limite_max):
     
+    st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+    st.markdown(
+                        """
+                        <div style="background-color: rgba(158, 8, 158, 0.8); color: white; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px; text-align: center; ">
+                            <strong>Distribuição de acertos</strong>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+    #st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+    
+    # 1. Filtrar a linha do aluno
+    nome_do_aluno = nome_aluno['Nome do aluno(a)'].iloc[0]
+    resultados = resultados[resultados['Acerto'] > 0]
+
+    if limite_max < 1000:
+
+        acerto_aluno = resultados[resultados['Nome do aluno(a)'] == nome_do_aluno]['Acerto'].iloc[0]
+
+        # 2. Calcular a média dos acertos
+        resultados_filtrados = resultados[resultados['Fez questão'] > limite_max*60/72]
+
+            # Calculando as médias
+        media_acertos = resultados_filtrados['Acerto'].mean()
+        media_acertos_jazz = resultados_filtrados[resultados_filtrados['Estratégia'] == '0. Aluno Jazz']['Acerto'].mean()
+
+        # 3. Criar o histograma com a coluna 'Acerto'
+        fig = go.Figure()
+
+        fig.add_trace(go.Histogram(
+            x=resultados['Acerto'],
+            name='Acertos',
+            nbinsx=20,  # Número de bins no histograma, ajuste conforme necessário
+            marker_color='rgba(158, 8, 158, 0.8)',  # Cor das barras do histograma
+            opacity=0.75
+        ))
+
+        # 4. Adicionar a linha vertical para o acerto do aluno
+        fig.add_vline(
+            x=acerto_aluno,
+            line=dict(color='blue', width=3, dash='dash'),
+            annotation_text=f'Acerto {nome_do_aluno}: {acerto_aluno}',  # Texto na linha
+            annotation_position="top right",
+            annotation=dict(font_size=12, yshift=-10)  # Move a anotação um pouco para cima
+        )
+
+        # 5. Adicionar a linha vertical para a média
+        fig.add_vline(
+            x=media_acertos,
+            line=dict(color='red', width=3, dash='dash'),
+            annotation_text=f'Média: {media_acertos:.1f}',  # Texto na linha
+            annotation_position="top left",
+            annotation=dict(font_size=12, yshift=0)  # Move a anotação um pouco para cima
+        )
+
+        fig.add_vline(
+            x=media_acertos_jazz,
+            line=dict(color='green', width=3, dash='dash'),
+            annotation_text=f'Média Jazz: {media_acertos_jazz:.1f}',  # Texto na linha
+            annotation_position="top",  # Posição da anotação
+            annotation=dict(font_size=12, yshift=10)  # Move a anotação um pouco para cima
+        )
+
+        # 6. Configurações do layout
+        fig.update_layout(
+            xaxis_title_text='Acertos',
+            yaxis_title_text='Número de alunos',
+            bargap=0.2,  # Espaço entre as barras
+            bargroupgap=0.1,  # Espaço entre os grupos de barras
+            xaxis_range=[0, limite_max]  # Definindo o limite máximo no eixo X
+        )
+
+    else:
+
+        acerto_aluno = resultados[resultados['Nome do aluno(a)'] == nome_do_aluno]['Nota na questão'].iloc[0]#.reset_index(drop = True).['Acerto'].iloc[0]
+        resultados_filtrados = resultados.copy()
+
+        media_acertos = resultados_filtrados['Nota na questão'].mean()
+        media_acertos_jazz = resultados_filtrados[resultados_filtrados['Estratégia'] == '0. Aluno Jazz']['Nota na questão'].mean()
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Histogram(
+            x=resultados['Nota na questão'],
+            name='Nota',
+            nbinsx=20,  # Número de bins no histograma, ajuste conforme necessário
+            marker_color='rgba(158, 8, 158, 0.8)',  # Cor das barras do histograma
+            opacity=0.75
+        ))
+
+        # 4. Adicionar a linha vertical para o acerto do aluno
+        fig.add_vline(
+            x=acerto_aluno,
+            line=dict(color='blue', width=3, dash='dash'),
+            annotation_text=f'Nota {nome_do_aluno}: {acerto_aluno}',  # Texto na linha
+            annotation_position="top right",
+            annotation=dict(font_size=12, yshift=-10)  # Move a anotação um pouco para cima
+        )
+
+        # 5. Adicionar a linha vertical para a média
+        fig.add_vline(
+            x=media_acertos,
+            line=dict(color='red', width=3, dash='dash'),
+            annotation_text=f'Média: {media_acertos:.1f}',  # Texto na linha
+            annotation_position="top left",
+            annotation=dict(font_size=12, yshift=0)  # Move a anotação um pouco para cima
+        )
+
+        fig.add_vline(
+            x=media_acertos_jazz,
+            line=dict(color='green', width=3, dash='dash'),
+            annotation_text=f'Média Jazz: {media_acertos_jazz:.1f}',  # Texto na linha
+            annotation_position="top",  # Posição da anotação
+            annotation=dict(font_size=12, yshift=10)  # Move a anotação um pouco para cima
+        )
+
+        # 6. Configurações do layout
+        fig.update_layout(
+            xaxis_title_text='Nota',
+            yaxis_title_text='Número de alunos',
+            bargap=0.2,  # Espaço entre as barras
+            bargroupgap=0.1,  # Espaço entre os grupos de barras
+            xaxis_range=[0, limite_max]  # Definindo o limite máximo no eixo X
+        )
+
+    # 7. Mostrar o gráfico no Streamlit
+    st.plotly_chart(fig, use_container_width=True)   
+
 def mostrar_resultados_simulados(nome, permissao, email):
 
     import time
@@ -582,142 +767,258 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     st.markdown('<style>td { border-right: none !important; }</style>', unsafe_allow_html=True)
 
-    alunos = ler_planilha("1ZyRboIm7Bf2P-sUroxIxidWsnX7ADFDdIN8Ck1Sdp0s", "Streamlit | Alunos!A1:E")
-    alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
-    alunos = alunos[alunos['Alunos'] != '']
+    #alunos = ler_planilha("1ZyRboIm7Bf2P-sUroxIxidWsnX7ADFDdIN8Ck1Sdp0s", "Streamlit | Alunos!A1:E")
+    #alunos['Alunos'] = alunos['Alunos'].fillna('').astype(str)
+    #alunos = alunos[alunos['Alunos'] != '']
 
-    if (permissao == 'Aluno' or permissao == 'Responsável'):
+    alunos_sn = ler_planilha("1aAxlTljt6SNvrZQSbHbZrhlG1EBfdidWCbFaFkz9EqU", "Inscritos!A1:E")
+    alunos_sn['Nome'] = alunos_sn['Nome'].fillna('').astype(str)
+    alunos_sn = alunos_sn[alunos_sn['Nome'] != '']
+
+    if (permissao == 'Aluno' or permissao == 'Responsável' or permissao == 'Inscrito Simulado Nacional'):
 
         nome_selecionado = nome
     
     else:
 
-        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Alunos'].unique())
+        nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos_sn['Nome'].unique())
+        
+        #nomes_alunos = ["Escolha o(a) aluno(a)"] + sorted(alunos['Alunos'].unique())
 
         nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos, key = 'Aluno')
+
+        if nome_selecionado == 'Escolha o(a) aluno(a)':
+
+            progress_bar.progress(1.00)
+            percentage_text.text("100%")
+            st.warning("Por favor, escolha um(a) aluno(a)!")
+            st.stop()
 
         data_hoje_brasilia, hora_atual_brasilia = dia_hora()
         data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
         escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
 
-    progress_bar.progress(0.05)
-    percentage_text.text("5%")
+    progress_bar.progress(50)
+    percentage_text.text("50%")
 
-    #### BASES INSPER
+    if permissao != 'Inscrito Simulado Nacional':
 
-    base_resultados_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Matemática Básica!A1:I3000")
+        simulados = ["Escolha o simulado"] + ['Simulado Insper 01'] + ['Simulado Insper 02'] + ['Simulado Insper 03'] + ['Simulado Insper 04'] + ['Simulado Insper 05'] + ['Simulado FGV 01'] + ['Simulado FGV 02'] + ['Simulado FGV 03'] + ['Simulado FGV 04'] + ['Simulado FGV 05'] + ['Simulado Matemática Básica']
 
-    progress_bar.progress(0.10)
-    percentage_text.text("10%")
+        simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
 
-    base_resultados_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:I4000")
+        if simulado_selecionado == 'Escolha o simulado':
 
-    progress_bar.progress(0.15)
-    percentage_text.text("15%")
+            progress_bar.progress(1.00)
+            percentage_text.text("100%")
+            st.warning("Por favor, escolha um simulado!")
+            st.stop()
 
-    base_resultados_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 02!A1:I4000")
+        if simulado_selecionado == 'Simulado Insper 01':
 
-    base_resultados_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 03!A1:I4000")
+            base_resultados_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:L4000")
+            base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:J22000")
 
-    base_resultados_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 04!A1:I4000")
+        elif simulado_selecionado == 'Simulado Insper 02':
 
-    progress_bar.progress(0.20)
-    percentage_text.text("20%")
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 02!A1:L4000")
+            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 02!A1:J22000")
 
-    base_resultados_insper_aux = pd.concat([base_resultados_insper1, base_resultados_insper2], axis=0)#.reset_index()
-    base_resultados_insper_aux2 = pd.concat([base_resultados_insper_aux, base_resultados_insper3], axis=0)
-    base_resultados_insper = pd.concat([base_resultados_insper_aux2, base_resultados_insper4], axis=0).reset_index()
+        elif simulado_selecionado == 'Simulado Insper 03':
 
-    ### BASES FGV
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 03!A1:L4000")
+            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 03!A1:J22000")
 
-    base_resultados_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 01!A1:I4000")
+        elif simulado_selecionado == 'Simulado Insper 04':
 
-    progress_bar.progress(0.25)
-    percentage_text.text("25%")
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 04!A1:L4000")
+            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 04!A1:J22000")
+
+        elif simulado_selecionado == 'Simulado Insper 05':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 05!A1:L22000")
+            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")
+
+        elif simulado_selecionado == 'Simulado FGV 01':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 01!A1:L4000")
+
+        elif simulado_selecionado == 'Simulado FGV 02':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:L4000")
+
+        elif simulado_selecionado == 'Simulado FGV 03':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 03!A1:L4000")
+
+        elif simulado_selecionado == 'Simulado FGV 04':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 04!A1:L4000")
+
+        elif simulado_selecionado == 'Simulado FGV 05':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 05!A1:L4000")
+
+        elif simulado_selecionado == 'Simulado Matemática Básica':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Matemática Básica!A1:I3000")
+
+        '''
+
+        #### BASES INSPER
+
+        base_resultados_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Matemática Básica!A1:I3000")
+
+        progress_bar.progress(0.10)
+        percentage_text.text("10%")
+
+        base_resultados_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 01!A1:L4000")
+
+        progress_bar.progress(0.15)
+        percentage_text.text("15%")
+
+        base_resultados_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 02!A1:L4000")
+
+        base_resultados_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 03!A1:L4000")
+
+        base_resultados_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 04!A1:L4000")
+
+        base_resultados_insper5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 05!A1:L24000")
+
+        progress_bar.progress(0.20)
+        percentage_text.text("20%")
+
+        base_resultados_insper_aux = pd.concat([base_resultados_insper1, base_resultados_insper2], axis=0)#.reset_index()
+        base_resultados_insper_aux2 = pd.concat([base_resultados_insper_aux, base_resultados_insper3], axis=0)
+        base_resultados_insper_aux3 = pd.concat([base_resultados_insper_aux2, base_resultados_insper4], axis=0)
+        base_resultados_insper = pd.concat([base_resultados_insper_aux3, base_resultados_insper5], axis=0).reset_index()
+
+        ### BASES FGV
+
+        base_resultados_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 01!A1:K4000")
+
+        progress_bar.progress(0.25)
+        percentage_text.text("25%")
+        
+        base_resultados_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:K4000")
+
+        base_resultados_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 03!A1:K4000")
+
+        base_resultados_fgv4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 04!A1:K4000")
+
+        base_resultados_fgv5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 05!A1:K4000")
+
+        progress_bar.progress(0.30)
+        percentage_text.text("30%")
+        
+        base_resultados_fgv_aux = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0)
+
+        base_resultados_fgv_aux2 = pd.concat([base_resultados_fgv_aux, base_resultados_fgv3], axis=0)
+
+        base_resultados_fgv_aux3 = pd.concat([base_resultados_fgv_aux2, base_resultados_fgv4], axis=0)
+
+        base_resultados_fgv = pd.concat([base_resultados_fgv_aux3, base_resultados_fgv5], axis=0).reset_index()
+        
+        base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
+        
+        base_resultados_aux = base_resultados_aux.drop(columns = ['level_0'])
+
+        base_resultados = pd.concat([base_resultados_aux, base_resultados_fgv], axis=0).reset_index()
+
+        #simulados = ["Escolha o simulado"] + sorted(base_resultados['Simulado'].drop_duplicates().sort_values().unique())
+
+        #st.write(simulados)
+
+        #simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
+        
+        #if simulado_selecionado == 'Escolha o simulado':
+        #
+        #    progress_bar.progress(1.00)
+        #    percentage_text.text("100%")
+        #    st.warning("Por favor, escolha um simulado!")
+        #    st.stop()
+
+        base_matriz_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Matemática Básica!A1:G1000")
+
+        base_matriz_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:G1000")
+
+        base_matriz_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 02!A1:G1000")
+
+        base_matriz_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 03!A1:G1000")
+
+        base_matriz_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 04!A1:G1000")
+
+        base_matriz_insper5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 05!A1:G1000")
+
+        progress_bar.progress(0.35)
+        percentage_text.text("35%")
+
+        base_matriz_insper_aux = pd.concat([base_matriz_insper1, base_matriz_insper2], axis=0)#.reset_index()
+        base_matriz_insper_aux2 = pd.concat([base_matriz_insper_aux, base_matriz_insper3], axis=0)
+        base_matriz_insper_aux3 = pd.concat([base_matriz_insper_aux2, base_matriz_insper4], axis=0)
+        base_matriz_insper = pd.concat([base_matriz_insper_aux3, base_matriz_insper5], axis=0).reset_index()
     
-    base_resultados_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 02!A1:I4000")
+        base_matriz_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 01!A1:G1000")
 
-    base_resultados_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 03!A1:I4000")
+        base_matriz_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 02!A1:G61")
 
-    base_resultados_fgv4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 04!A1:I4000")
+        base_matriz_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 03!A1:G61")
 
-    base_resultados_fgv5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 05!A1:I4000")
+        base_matriz_fgv4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 04!A1:G61")
 
-    progress_bar.progress(0.30)
-    percentage_text.text("30%")
+        base_matriz_fgv5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 05!A1:G61")
+
+        progress_bar.progress(0.40)
+        percentage_text.text("40%")
+
+        base_matriz_fgv_aux = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0)
+
+        base_matriz_fgv_aux2 = pd.concat([base_matriz_fgv_aux, base_matriz_fgv3], axis=0)
+
+        base_matriz_fgv_aux3 = pd.concat([base_matriz_fgv_aux2, base_matriz_fgv4], axis=0)
+
+        base_matriz_fgv = pd.concat([base_matriz_fgv_aux3, base_matriz_fgv5], axis=0).reset_index()
     
-    base_resultados_fgv_aux = pd.concat([base_resultados_fgv1, base_resultados_fgv2], axis=0)
+        base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:J22000")
+        
+        base_redacao_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 02!A1:J22000")
 
-    base_resultados_fgv_aux2 = pd.concat([base_resultados_fgv_aux, base_resultados_fgv3], axis=0)
+        base_redacao_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 03!A1:J22000")
 
-    base_resultados_fgv_aux3 = pd.concat([base_resultados_fgv_aux2, base_resultados_fgv4], axis=0)
+        base_redacao_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 04!A1:J22000")
 
-    base_resultados_fgv = pd.concat([base_resultados_fgv_aux3, base_resultados_fgv5], axis=0).reset_index()
-    
-    base_resultados_aux = pd.concat([base_resultados_matbasica, base_resultados_insper], axis=0).reset_index()
-    
-    base_resultados_aux = base_resultados_aux.drop(columns = ['level_0'])
+        base_redacao_insper5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")
 
-    base_resultados = pd.concat([base_resultados_aux, base_resultados_fgv], axis=0).reset_index()
+        progress_bar.progress(0.45)
+        percentage_text.text("45%")
+        
+        base_redacao_insper_aux = pd.concat([base_redacao_insper1, base_redacao_insper2], axis=0)#.reset_index()
+        base_redacao_insper_aux2 = pd.concat([base_redacao_insper_aux, base_redacao_insper3], axis=0)
+        base_redacao_insper_aux3 = pd.concat([base_redacao_insper_aux2, base_redacao_insper4], axis=0)
+        base_redacao_insper = pd.concat([base_redacao_insper_aux3, base_redacao_insper5], axis=0).reset_index()
 
-    simulados = ["Escolha o simulado"] + sorted(base_resultados['Simulado'].drop_duplicates().sort_values().unique())
+        base_redacao_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação | FGV!A1:I22000")
 
-    simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
+        base_matriz_aux = pd.concat([base_matriz_matbasica, base_matriz_insper], axis=0).reset_index()
+        base_matriz_aux = base_matriz_aux.drop(columns = ['level_0'])
+        base_matriz = pd.concat([base_matriz_aux, base_matriz_fgv], axis=0).reset_index()
 
-    base_matriz_matbasica = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Matemática Básica!A1:G1000")
+        base_redacao = pd.concat([base_redacao_insper, base_redacao_fgv], ignore_index=True)
 
-    base_matriz_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 01!A1:G1000")
+        '''
 
-    base_matriz_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 02!A1:G1000")
+    else:
 
-    base_matriz_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 03!A1:G1000")
+        base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 05!A1:L24000")      
 
-    base_matriz_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 04!A1:G1000")
+        #base_matriz_insper5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 05!A1:G1000")
 
-    progress_bar.progress(0.35)
-    percentage_text.text("35%")
+        #base_matriz = base_matriz_insper5.copy()
 
-    base_matriz_insper_aux = pd.concat([base_matriz_insper1, base_matriz_insper2], axis=0)#.reset_index()
-    base_matriz_insper_aux2 = pd.concat([base_matriz_insper_aux, base_matriz_insper3], axis=0)
-    base_matriz_insper = pd.concat([base_matriz_insper_aux2, base_matriz_insper4], axis=0).reset_index()
-    
-    base_matriz_fgv1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 01!A1:G1000")
+        base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")
 
-    base_matriz_fgv2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 02!A1:G61")
+        simulado_selecionado = 'Simulado Insper 05'
 
-    base_matriz_fgv3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 03!A1:G61")
-
-    base_matriz_fgv4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 04!A1:G61")
-
-    base_matriz_fgv5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | FGV 05!A1:G61")
-
-    progress_bar.progress(0.40)
-    percentage_text.text("40%")
-
-    base_matriz_fgv_aux = pd.concat([base_matriz_fgv1, base_matriz_fgv2], axis=0)
-
-    base_matriz_fgv_aux2 = pd.concat([base_matriz_fgv_aux, base_matriz_fgv3], axis=0)
-
-    base_matriz_fgv_aux3 = pd.concat([base_matriz_fgv_aux2, base_matriz_fgv4], axis=0)
-
-    base_matriz_fgv = pd.concat([base_matriz_fgv_aux3, base_matriz_fgv5], axis=0).reset_index()
-    
-    base_redacao_insper1 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 01!A1:I22000")
-    
-    base_redacao_insper2 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 02!A1:I22000")
-
-    base_redacao_insper3 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 03!A1:I22000")
-
-    base_redacao_insper4 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 04!A1:I22000")
-
-    progress_bar.progress(0.45)
-    percentage_text.text("45%")
-    
-    base_redacao_insper_aux = pd.concat([base_redacao_insper1, base_redacao_insper2], axis=0)#.reset_index()
-    base_redacao_insper_aux2 = pd.concat([base_redacao_insper_aux, base_redacao_insper3], axis=0)
-    base_redacao_insper = pd.concat([base_redacao_insper_aux2, base_redacao_insper4], axis=0).reset_index()
-
-    base_redacao_fgv = ler_planilha("1dwbt5wTCV1Dj0pukwCZDy4i6p6E3_bTYzDwNHFXfmV0", "Todos | Redação | FGV!A1:I22000")
 
     turma_eng12 = 'Engenharias e Ciência da Computação'
     turma_cien12 = 'Engenharias e Ciência da Computação'
@@ -738,14 +1039,8 @@ def mostrar_resultados_simulados(nome, permissao, email):
     turma_eco2 = 'Administração, Economia e Direito'
     turma_dir2 = 'Administração, Economia e Direito'
 
-    base_matriz_aux = pd.concat([base_matriz_matbasica, base_matriz_insper], axis=0).reset_index()
-    base_matriz_aux = base_matriz_aux.drop(columns = ['level_0'])
-    base_matriz = pd.concat([base_matriz_aux, base_matriz_fgv], axis=0).reset_index()
-
-    base_redacao = pd.concat([base_redacao_insper, base_redacao_fgv], ignore_index=True)
-
-    base_resultados['Disciplina'] = ''
-    base_resultados['Assunto'] = ''
+    #base_resultados['Disciplina'] = ''
+    #base_resultados['Assunto'] = ''
 
     bar_color = '#9E089E'
 
@@ -774,18 +1069,23 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         #login_aluno = st.text_input('Digite o seu login', '')
 
-    base_resultados_simu_selecionado = base_resultados[base_resultados['Simulado'] == simulado_selecionado]
+    base_resultados_simu_selecionado = base_resultados.copy()
+
+    #base_resultados_simu_selecionado = base_resultados[base_resultados['Simulado'] == simulado_selecionado]
     base_resultados_simu_selecionado = base_resultados_simu_selecionado[base_resultados_simu_selecionado['num_exercicio'] != "73"].reset_index(drop = True) 
 
     if (nome_selecionado == 'Escolha o(a) aluno(a)' or simulado_selecionado == 'Escolha o simulado'):
 
-        progress_bar.progress(1.00)
-        percentage_text.text("100%")
+        progress_bar.progress(0.4)
+        percentage_text.text("40%")
 
     if (nome_selecionado != 'Escolha o(a) aluno(a)' and simulado_selecionado != 'Escolha o simulado'):
 
         auxiliar_aluno = base_resultados_simu_selecionado[base_resultados_simu_selecionado['aluno_nome'] == nome_selecionado].reset_index(drop = True)  
+
         login_aluno = auxiliar_aluno['aluno_login'][0]
+
+        '''
     #if login_aluno != '':
         #estado['pagina_atual'] = 'Alunos - Resultados nos simulados [pós login]'
         # Substituindo o range(len(...)) pelo tqdm para adicionar a barra de progresso
@@ -817,6 +1117,8 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         # Removendo a barra de progresso e o componente de texto no final do loop
         st.empty()
+
+        '''
     else:
         st.warning('Por favor, preencha selecione o(a) aluno(a) e o simulado para continuar.')
 
@@ -837,16 +1139,23 @@ def mostrar_resultados_simulados(nome, permissao, email):
         base['Novo Nota na questão'] = base['Acerto'] * base['Novo Valor da questão']
         base['Nota na questão'] = base['Acerto'] * base['Valor da questão']
 
-        resultados_gerais = base.groupby(['Nome da avaliação','Turma','Nome do aluno(a)','Login do aluno(a)','Simulado']).sum().reset_index()
+        base['Fez questão'] = base['Certo ou errado'].apply(lambda x: 1.00 if x in ['certo', 'errado'] else 0.00)
 
+        resultados_gerais = base.groupby(['Nome da avaliação','Turma','Nome do aluno(a)','Login do aluno(a)','Simulado','Estratégia',]).sum().reset_index()
 
-        resultados_gerais2 = resultados_gerais.groupby(['Turma','Nome do aluno(a)','Login do aluno(a)','Simulado']).sum().reset_index()
+        progress_bar.progress(0.6)
+        percentage_text.text("60%")
+
+        resultados_gerais2 = resultados_gerais.groupby(['Turma','Nome do aluno(a)','Login do aluno(a)','Simulado','Estratégia']).sum().reset_index()
         resultados_gerais2_aux = resultados_gerais2.copy()
         for i in range(len(resultados_gerais2_aux['Login do aluno(a)'])):
             resultados_gerais2_aux['Nota na questão'][i] = 1.25*resultados_gerais2_aux['Nota na questão'][i]
             resultados_gerais2_aux['Novo Nota na questão'][i] = 1.25*resultados_gerais2_aux['Novo Nota na questão'][i]
 
         resultados_gerais3 = resultados_gerais2_aux.sort_values(by = 'Nota na questão', ascending = False).reset_index(drop = True)   
+
+        progress_bar.progress(0.8)
+        percentage_text.text("80%")
 
         #simulados = resultados_gerais3['Simulado'].drop_duplicates().sort_values()
 
@@ -878,18 +1187,28 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     if (nome_selecionado != 'Escolha o(a) aluno(a)' and simulado_selecionado != 'Escolha o simulado'):
 
+        resultados_gerais3['Classificação'] = resultados_gerais3['Acerto'].rank(method='min', ascending=False).astype(int)
+
         resultados_gerais_aluno1 = resultados_gerais3[resultados_gerais3['Nome do aluno(a)'] == nome_aluno3['Nome do aluno(a)'][0]]
-        resultados_gerais_aluno1 = resultados_gerais_aluno1.drop(columns = ['level_0']) ###
+
+        #if permissao != 'Inscrito Simulado Nacional':
+
+        #    resultados_gerais_aluno1 = resultados_gerais_aluno1.drop(columns = ['level_0']) ###
+
         resultados_gerais_aluno = resultados_gerais_aluno1[resultados_gerais_aluno1['Simulado'] == simulado_selecionado].reset_index()
 
         resultados_gerais4 = resultados_gerais3[resultados_gerais3['Nota na questão'] > 0]
 
-        resultados_gerais4_aux = resultados_gerais4[['Login do aluno(a)','Valor da questão','Acerto','Nota na questão','Simulado', 'Novo Nota na questão']]
+        resultados_gerais4_aux = resultados_gerais4[['Login do aluno(a)','Valor da questão','Acerto','Nota na questão','Simulado', 'Novo Nota na questão','Fez questão']]
         resultados_gerais5_aux = resultados_gerais4_aux.copy()
         resultados_gerais5 = resultados_gerais5_aux[resultados_gerais5_aux['Simulado'] == simulado_selecionado].reset_index() 
 
         alunos_fizeram = pd.DataFrame()
-        resultados_gerais4 = resultados_gerais4.drop(columns = ['level_0']) ###
+
+        #if permissao != 'Inscrito Simulado Nacional':
+
+        #    resultados_gerais4 = resultados_gerais4.drop(columns = ['level_0']) ###
+
         resultados_gerais4_aux2 = resultados_gerais4[resultados_gerais4['Simulado'] == simulado_selecionado].reset_index()
 
         alunos_fizeram['Nome do aluno(a)'] = resultados_gerais4_aux2['Nome do aluno(a)']
@@ -898,6 +1217,9 @@ def mostrar_resultados_simulados(nome, permissao, email):
         aux = resultados_gerais4[(resultados_gerais4['Turma'] == turma_eng12) | (resultados_gerais4['Turma'] == turma_eng2)]
         aux2 = resultados_gerais4[(resultados_gerais4['Turma'] == turma_cien12) | (resultados_gerais4['Turma'] == turma_cien2)]
         numero_eng_cien = len(aux['Nome do aluno(a)']) + len(aux2['Nome do aluno(a)'])
+
+        progress_bar.progress(1.00)
+        percentage_text.text("100%")
 
         st.markdown('<div style="height: 50px;"></div>', unsafe_allow_html=True)
 
@@ -911,26 +1233,36 @@ def mostrar_resultados_simulados(nome, permissao, email):
                         """,
                         unsafe_allow_html=True
                     )
-        
+
         if "Insper" in simulado_selecionado:
 
-            cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'Insper Total')
+            if simulado_selecionado != 'Simulado Insper 05':
+
+                cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'Insper Total', '0', '0')
+
+            else:
+
+                resultados_gerais5_60 = resultados_gerais5[resultados_gerais5['Fez questão'] > 60]
+
+                cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais5_60['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5_60['Acerto'].mean(),0)),'Simulado Nacional Insper 1ª fase Total', str(int(round(truncar(resultados_gerais_aluno['Classificação'][0],0),0)))+'º',int(len(resultados_gerais5['index'])))
 
         if "FGV" in simulado_selecionado:
 
-            cards_principais(int(round(0.8*resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(0.8*resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'FGV Total')
+            cards_principais(int(round(0.8*resultados_gerais_aluno['Novo Nota na questão'][0],1)), int(round(truncar(0.8*resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'FGV Total', '0', '0')
 
         if "Matemática" in simulado_selecionado:
 
-            cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0]/1.25,1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'Matemática')
+            cards_principais(int(round(resultados_gerais_aluno['Novo Nota na questão'][0]/1.25,1)), int(round(truncar(resultados_gerais5['Novo Nota na questão'].mean(),-1))), int(round(truncar(resultados_gerais_aluno['Acerto'][0],0),0)), int(round(resultados_gerais5['Acerto'].mean(),0)),'Matemática', '0', '0')
 
+        criar_histograma_acertos(resultados_gerais3, nome_aluno3, 72)
+        
         base_alunos_fizeram_aux = base[base['Nome do aluno(a)'].isin(alunos_fizeram['Nome do aluno(a)'])].reset_index(drop = True)
 
         base_alunos_fizeram = base_alunos_fizeram_aux[base_alunos_fizeram_aux['Simulado'] == simulado_selecionado]
 
         base_alunos_fizeram_aux2 = base_alunos_fizeram.drop(columns = ['Nome da avaliação','Certo ou errado','Assunto'])
 
-        resultados_gerais_disciplina_aux = base_alunos_fizeram_aux2.groupby(['Turma','Login do aluno(a)','Nome do aluno(a)','Disciplina','Simulado']).sum().reset_index()
+        resultados_gerais_disciplina_aux = base_alunos_fizeram_aux2.groupby(['Turma','Login do aluno(a)','Nome do aluno(a)','Disciplina','Simulado','Estratégia']).sum().reset_index()
 
         resultados_gerais_disciplina = resultados_gerais_disciplina_aux[resultados_gerais_disciplina_aux['Acerto'] > 0]
 
@@ -953,11 +1285,17 @@ def mostrar_resultados_simulados(nome, permissao, email):
         resultados_gerais_disciplina5 = resultados_gerais_disciplina4.sort_values(by = 'Disciplina', ascending = False)
 
         resultados_gerais_disciplina3['Login do aluno(a)'] = resultados_gerais_disciplina3['Login do aluno(a)'].apply(extract_login)
-        resultados_gerais_disciplina3 = resultados_gerais_disciplina3.drop(columns = ['level_0']) ###
+        
+        #if permissao != 'Inscrito Simulado Nacional':
+        
+        #    resultados_gerais_disciplina3 = resultados_gerais_disciplina3.drop(columns = ['level_0']) ###
+
         resultados_disciplina_aluno = resultados_gerais_disciplina3[resultados_gerais_disciplina3['Login do aluno(a)'] == login_aluno].reset_index()
         resultados_disciplina_aluno2 = resultados_disciplina_aluno.sort_values(by = 'Disciplina', ascending = False)
 
-        resultados_disciplina_aluno2 = resultados_disciplina_aluno2.drop(columns=['level_0'])      
+        #if permissao != 'Inscrito Simulado Nacional':
+
+        #    resultados_disciplina_aluno2 = resultados_disciplina_aluno2.drop(columns=['level_0'])      
 
         resultados_matematica = resultados_disciplina_aluno2[resultados_disciplina_aluno2['Disciplina'] == 'Matemática'].reset_index()
         resultados_linguagens = resultados_disciplina_aluno2[resultados_disciplina_aluno2['Disciplina'] == 'Linguagens'].reset_index()
@@ -1062,13 +1400,28 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
             st.markdown(html_br, unsafe_allow_html=True)            
 
+            #resultados_gerais_disciplina3_mat.drop(columns='level_0', inplace=True)
+            resultados_gerais_disciplina3_mat = resultados_gerais_disciplina3_mat.sort_values(by = 'Acerto', ascending = False)
+            resultados_gerais_disciplina3_mat['Classificação'] = resultados_gerais_disciplina3_mat['Acerto'].rank(method='min', ascending=False).astype(int)
+            resultados_gerais_disciplina3_mat_aluno = resultados_gerais_disciplina3_mat[resultados_gerais_disciplina3_mat['Login do aluno(a)'] == login_aluno].reset_index(drop = True)
+
             if "Insper" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Nota na questão'][0],-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Acerto'][0],-1),0)),'Insper')
+                if simulado_selecionado != 'Simulado Insper 05':
+
+                    cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Nota na questão'][0],-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Acerto'][0],-1),0)),'Insper', '0', '0')
+
+                else:
+
+                    resultados_gerais_disciplina_med_mat_20 = resultados_gerais_disciplina3_mat[resultados_gerais_disciplina3_mat['Fez questão'] > 20]
+
+                    cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat_20['Nota na questão'].mean(),-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat_20['Acerto'].mean(),-1),0)),'Simulado Nacional Insper 1ª fase', str(int(round(truncar(resultados_gerais_disciplina3_mat_aluno['Classificação'][0],-1),0)))+"º", str(int(len(resultados_gerais_disciplina3_mat['Classificação']))))              
 
             if "FGV" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Nota na questão'][0],-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Acerto'][0],-1),0)),'FGV')
+                cards_principais(int(round(resultados_matematica['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Nota na questão'][0],-1),0)), int(round(resultados_matematica['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_mat['Acerto'][0],-1),0)),'FGV', '0', '0')
+
+            criar_histograma_acertos(resultados_gerais_disciplina3_mat, nome_aluno3, 24)
 
             with st.container():
                 col1, col2, col3 = st.columns([5,0.1,2.5])
@@ -1141,13 +1494,29 @@ def mostrar_resultados_simulados(nome, permissao, email):
                         """,
                         unsafe_allow_html=True
                     )
+
+            #resultados_gerais_disciplina3_lin.drop(columns='level_0', inplace=True)
+            resultados_gerais_disciplina3_lin = resultados_gerais_disciplina3_lin.sort_values(by = 'Acerto', ascending = False)
+            resultados_gerais_disciplina3_lin['Classificação'] = resultados_gerais_disciplina3_lin['Acerto'].rank(method='min', ascending=False).astype(int)
+            resultados_gerais_disciplina3_lin_aluno = resultados_gerais_disciplina3_lin[resultados_gerais_disciplina3_lin['Login do aluno(a)'] == login_aluno].reset_index(drop = True)
+
             if "Insper" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_linguagens['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Nota na questão'][0],-1),0)), int(round(resultados_linguagens['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Acerto'][0],-1),0)),'Insper')
+                if simulado_selecionado != 'Simulado Insper 05':
+
+                    cards_principais(int(round(resultados_linguagens['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Nota na questão'][0],-1),0)), int(round(resultados_linguagens['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Acerto'][0],-1),0)),'Insper', '0', '0')
+
+                else:
+
+                    resultados_gerais_disciplina_med_lin_20 = resultados_gerais_disciplina3_lin[resultados_gerais_disciplina3_lin['Fez questão'] > 20]
+
+                    cards_principais(int(round(resultados_linguagens['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin_20['Nota na questão'].mean(),-1),0)), int(round(resultados_linguagens['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin_20['Acerto'].mean(),-1),0)),'Simulado Nacional Insper 1ª fase', str(int(round(truncar(resultados_gerais_disciplina3_lin_aluno['Classificação'][0],-1),0)))+"º", str(int(len(resultados_gerais_disciplina3_lin['Classificação']))))      
 
             if "FGV" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_linguagens['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Nota na questão'][0],-1),0)), int(round(resultados_linguagens['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Acerto'][0],-1),0)),'FGV')
+                cards_principais(int(round(resultados_linguagens['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Nota na questão'][0],-1),0)), int(round(resultados_linguagens['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lin['Acerto'][0],-1),0)),'FGV', '0', '0')
+
+            criar_histograma_acertos(resultados_gerais_disciplina3_lin, nome_aluno3, 24)
 
         elif len(resultados_lingua_port['Nome do aluno(a)']) != 0:
 
@@ -1163,11 +1532,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
                     )
             if "Insper" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_lingua_port['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Nota na questão'][0],-1),0)), int(round(resultados_lingua_port['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Acerto'][0],-1),0)),'Insper')
+                cards_principais(int(round(resultados_lingua_port['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Nota na questão'][0],-1),0)), int(round(resultados_lingua_port['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Acerto'][0],-1),0)),'Insper', '0', '0')
 
             if "FGV" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_lingua_port['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Nota na questão'][0],-1),0)), int(round(resultados_lingua_port['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Acerto'][0],-1),0)),'FGV')
+                cards_principais(int(round(resultados_lingua_port['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Nota na questão'][0],-1),0)), int(round(resultados_lingua_port['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_lp['Acerto'][0],-1),0)),'FGV', '0', '0')
     
 
         if len(resultados_linguagens['Nome do aluno(a)']) != 0 or  len(resultados_lingua_port['Nome do aluno(a)']) != 0:
@@ -1238,11 +1607,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
             
             if "Insper" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_ingles['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Nota na questão'][0],-1),0)), int(round(resultados_ingles['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Acerto'][0],-1),0)),'Insper')
+                cards_principais(int(round(resultados_ingles['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Nota na questão'][0],-1),0)), int(round(resultados_ingles['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Acerto'][0],-1),0)),'Insper', '0', '0')
 
             if "FGV" in simulado_selecionado:
 
-                cards_principais(int(round(resultados_ingles['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Nota na questão'][0],-1),0)), int(round(resultados_ingles['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Acerto'][0],-1),0)),'FGV')
+                cards_principais(int(round(resultados_ingles['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Nota na questão'][0],-1),0)), int(round(resultados_ingles['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_ing['Acerto'][0],-1),0)),'FGV', '0', '0')
 
             with st.container():
                 col1, col2, col3 = st.columns([5,0.1,2.5])
@@ -1328,13 +1697,28 @@ def mostrar_resultados_simulados(nome, permissao, email):
                                 unsafe_allow_html=True
                             )
 
-                if "Insper" in simulado_selecionado:
+            #resultados_gerais_disciplina3_fim.drop(columns='level_0', inplace=True)
+            resultados_gerais_disciplina3_fim = resultados_gerais_disciplina3_fim.sort_values(by = 'Acerto', ascending = False)
+            resultados_gerais_disciplina3_fim['Classificação'] = resultados_gerais_disciplina3_fim['Acerto'].rank(method='min', ascending=False).astype(int)
+            resultados_gerais_disciplina3_fim_aluno = resultados_gerais_disciplina3_fim[resultados_gerais_disciplina3_fim['Login do aluno(a)'] == login_aluno].reset_index(drop = True)
 
-                    cards_principais(int(round(resultados_ciencias_fim['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Nota na questão'][0],-1),0)), int(round(resultados_ciencias_fim['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Acerto'][0],-1),0)),'Insper')
+            if "Insper" in simulado_selecionado:
+
+                if simulado_selecionado != 'Simulado Insper 05':
+
+                    cards_principais(int(round(resultados_ciencias_fim['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Nota na questão'][0],-1),0)), int(round(resultados_ciencias_fim['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Acerto'][0],-1),0)),'Insper', '0', '0')
+
+                else:
+
+                    resultados_gerais_disciplina_med_cie_20 = resultados_gerais_disciplina3_fim[resultados_gerais_disciplina3_fim['Fez questão'] > 20]
+
+                    cards_principais(int(round(resultados_ciencias_fim['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie_20['Nota na questão'].mean(),-1),0)), int(round(resultados_ciencias_fim['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie_20['Acerto'].mean(),-1),0)),'Simulado Nacional Insper 1ª fase', str(int(round(truncar(resultados_gerais_disciplina3_fim_aluno['Classificação'][0],-1),0)))+"º", str(int(len(resultados_gerais_disciplina3_fim['Classificação']))))      
 
                 if "FGV" in simulado_selecionado:
 
-                    cards_principais(int(round(resultados_ciencias_fim['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Nota na questão'][0],-1),0)), int(round(resultados_ciencias_fim['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Acerto'][0],-1),0)),'FGV')
+                    cards_principais(int(round(resultados_ciencias_fim['Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Nota na questão'][0],-1),0)), int(round(resultados_ciencias_fim['Acerto'][0],1)), int(round(truncar(resultados_gerais_disciplina_med_cie['Acerto'][0],-1),0)),'FGV', '0', '0')
+
+                criar_histograma_acertos(resultados_gerais_disciplina3_fim, nome_aluno3, 24)
 
                 with st.container():
                     col1, col2, col3 = st.columns([5,0.1,2.5])
@@ -1410,7 +1794,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
         redacao_tabela_vermelho = redacao_tabela_ordenado[redacao_tabela_ordenado['Status'] == '🔴']
         redacao_tabela_vermelho_ordenado = redacao_tabela_vermelho.sort_values(by = 'Diferença', ascending = True).reset_index(drop = True)
 
-        base_redacao_disciplina = base_redacao2.groupby('Login do aluno(a)').sum().reset_index()
+        base_redacao_disciplina = base_redacao2.groupby(['Login do aluno(a)','Nome do aluno(a)']).sum().reset_index()
             
         for i in range(len(base_redacao_disciplina['Login do aluno(a)'])):
             if base_redacao_disciplina['Nota na questão'][i] > 0:
@@ -1435,15 +1819,8 @@ def mostrar_resultados_simulados(nome, permissao, email):
                             """,
                             unsafe_allow_html=True
                         )
-            if "Insper" in simulado_selecionado:
-  
-                cards_principais(int(round(200+0.8*redacao_aluno_media['Nota na questão'].sum(),1)), int(round(200+0.8*200*redacao_tabela3['Resultado Geral decimal'].sum(),0)), 0, 0, 'Insper')
 
-            if "FGV" in simulado_selecionado:
-  
-                cards_principais(int(round(200+0.8*redacao_aluno_media['Nota na questão'].sum(),1)), int(round(200+0.8*200*redacao_tabela3['Resultado Geral decimal'].sum(),0)), 0, 0, 'FGV')
-
-            base_redacao3 = base_redacao2.groupby('Login do aluno(a)').sum().reset_index()
+            base_redacao3 = base_redacao2.groupby(['Login do aluno(a)','Nome do aluno(a)','Estratégia']).sum().reset_index()
             for i in range(len(base_redacao3['Nota na questão'])):
                 if base_redacao3['Nota na questão'][i] > 0:
                     base_redacao3['Nota na questão'][i] = 200 + 0.8*base_redacao3['Nota na questão'][i]
@@ -1451,6 +1828,25 @@ def mostrar_resultados_simulados(nome, permissao, email):
             base_redacao3aux = base_redacao3[base_redacao3['Nota na questão'] > 0]
 
             base_redacao5 = base_redacao3aux['Nota na questão'].mean()
+
+            resultados_gerais_redacao = base_redacao3.sort_values(by = 'Nota na questão', ascending = False)
+            resultados_gerais_redacao['Classificação'] = resultados_gerais_redacao['Nota na questão'].rank(method='min', ascending=False).astype(int)
+            resultados_gerais_redacao_aluno = resultados_gerais_redacao[resultados_gerais_redacao['Login do aluno(a)'] == login_aluno].reset_index(drop = True)
+
+            if "Insper" in simulado_selecionado:
+
+                if simulado_selecionado != 'Simulado Insper 05':
+
+                    cards_principais(int(round(200+0.8*redacao_aluno_media['Nota na questão'].sum(),1)), int(round(200+0.8*200*redacao_tabela3['Resultado Geral decimal'].sum(),0)), 0, 0, 'Insper', '0', '0')
+                else:
+
+                    cards_principais(int(round(200+0.8*redacao_aluno_media['Nota na questão'].sum(),1)), int(round(200+0.8*200*redacao_tabela3['Resultado Geral decimal'].sum(),0)), 0, 0, 'Simulado Nacional Insper 1ª fase', str(int(round(truncar(resultados_gerais_redacao_aluno['Classificação'][0],-1),0)))+"º", str(int(len(resultados_gerais_redacao['Classificação']))))              
+
+            if "FGV" in simulado_selecionado:
+  
+                cards_principais(int(round(200+0.8*redacao_aluno_media['Nota na questão'].sum(),1)), int(round(200+0.8*200*redacao_tabela3['Resultado Geral decimal'].sum(),0)), 0, 0, 'FGV', '0', '0')
+
+            criar_histograma_acertos(resultados_gerais_redacao, nome_aluno3, 1000)
 
             with st.container():
                     col1, col2, col3 = st.columns([5,0.1,2.5])
@@ -1462,7 +1858,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
         if len(resultados_matematica['Nome do aluno(a)']) != 0:
 
             tabela_detalhes_aux = base.copy()
-            tabela_detalhes_aux = tabela_detalhes_aux.drop(columns = ['level_0']) ###
+
+            #if permissao != 'Inscrito Simulado Nacional':
+
+            #    tabela_detalhes_aux = tabela_detalhes_aux.drop(columns = ['level_0']) ###
+
             tabela_detalhes = tabela_detalhes_aux[tabela_detalhes_aux['Simulado'] == simulado_selecionado].reset_index()
                 
             tabela_detalhes['Login do aluno(a)'] = tabela_detalhes['Login do aluno(a)'].apply(extract_login)
@@ -1599,7 +1999,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 resultados_gerais_disc_aluno2 = resultados_gerais_disc_aluno[resultados_gerais_disc_aluno['Área'] == 'Matemática'].reset_index(drop = True)
                 resultados_gerais_disc6 = resultados_gerais_disc5[resultados_gerais_disc5['Área'] == 'Matemática'].reset_index(drop = True)
 
-                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Matemática')
+                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Matemática', '0', '0')
 
                 st.markdown(html_br, unsafe_allow_html=True)
 
@@ -1631,7 +2031,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 resultados_gerais_disc_aluno2 = resultados_gerais_disc_aluno[resultados_gerais_disc_aluno['Área'] == 'Língua Portuguesa'].reset_index(drop = True)
                 resultados_gerais_disc6 = resultados_gerais_disc5[resultados_gerais_disc5['Área'] == 'Língua Portuguesa'].reset_index(drop = True)
                 
-                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Língua Portuguesa')
+                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Língua Portuguesa', '0', '0')
 
                 st.markdown(html_br, unsafe_allow_html=True)
 
@@ -1663,7 +2063,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 resultados_gerais_disc_aluno2 = resultados_gerais_disc_aluno[resultados_gerais_disc_aluno['Área'] == 'Ciências Humanas'].reset_index(drop = True)
                 resultados_gerais_disc6 = resultados_gerais_disc5[resultados_gerais_disc5['Área'] == 'Ciências Humanas'].reset_index(drop = True)
 
-                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Ciências Humanas')
+                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Ciências Humanas', '0', '0')
 
                 st.markdown(html_br, unsafe_allow_html=True)
 
@@ -1693,7 +2093,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 resultados_gerais_disc_aluno2 = resultados_gerais_disc_aluno[resultados_gerais_disc_aluno['Área'] == 'Artes e Questões Contemporâneas'].reset_index(drop = True)
                 resultados_gerais_disc6 = resultados_gerais_disc5[resultados_gerais_disc5['Área'] == 'Artes e Questões Contemporâneas'].reset_index(drop = True)
 
-                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Artes e QC')
+                cards_principais(int(round(resultados_gerais_disc_aluno2['Novo Nota na questão'][0],1)), int(round(truncar(resultados_gerais_disc6['Novo Nota na questão'].mean(),-1))), 0, 0,'FGV Disc Artes e QC', '0', '0')
 
                 st.markdown(html_br, unsafe_allow_html=True)
 

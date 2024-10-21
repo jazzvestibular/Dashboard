@@ -567,6 +567,13 @@ def mostrar_gamificacao(nome, permissao, email):
     alunos = alunos[alunos['Alunos'] != '']
     alunos.rename(columns = {'Alunos':'Nome do aluno(a)'}, inplace = True)
 
+    progress = st.progress(0)
+    percentage_text = st.empty()
+
+    def update_progress(value):
+        progress.progress(value)
+        percentage_text.text(f"{round((value))}%")
+
     if (permissao == 'Aluno' or permissao == 'Responsável'):
 
         nome_selecionado = nome
@@ -577,6 +584,12 @@ def mostrar_gamificacao(nome, permissao, email):
 
         nome_selecionado = st.selectbox('Selecione um(a) aluno(a):', nomes_alunos)
 
+        if nome_selecionado == 'Escolha o(a) aluno(a)':
+
+            update_progress(100)
+            st.warning("Por favor, escolha um(a) aluno(a)!")
+            st.stop()
+
         data_hoje_brasilia, hora_atual_brasilia = dia_hora()
         data_to_write = [[nome, permissao, data_hoje_brasilia, hora_atual_brasilia, get_estado()['pagina_atual'], "", nome_selecionado, email]]
         escrever_planilha("1Folwdg9mIwSxyzQuQlmwCoEPFq_sqC39MohQxx_J2_I", data_to_write, "Logs")
@@ -584,13 +597,6 @@ def mostrar_gamificacao(nome, permissao, email):
     end_time = time.time()
     elapsed_time = end_time - start_time
     #st.write(elapsed_time)
-
-    progress = st.progress(0)
-    percentage_text = st.empty()
-
-    def update_progress(value):
-        progress.progress(value)
-        percentage_text.text(f"{round((value))}%")
 
     presenca_aulasMT1 = ler_planilha("122UPTJRh0PmjezG64b8gdFtKftycXaprcytTSbwX-dg", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
     #presenca_aulasMT1 = ler_planilha("1rq83WLY5Wy6jZMtf54oB2wfhibq_6MywEcVV9SK60oI", "Streamlit | Presença nas aulas | Manhã + Tarde 1!A1:R")
@@ -817,7 +823,7 @@ def mostrar_gamificacao(nome, permissao, email):
         gamificacao3 = gamificacao_final.sort_values(by = 'Pontuação', ascending = False)
         gamificacao3 = gamificacao3[gamificacao3['Pontuação'] >= 0]
 
-        pont_niveis = [400, 1000, 1900, 2800, 3700, 5200]
+        pont_niveis = [400, 1000, 1900, 2800, 3700, 5000]
 
         gamificacao3['Nível'] = gamificacao3['Pontuação'].apply(definir_nivel, args=(pont_niveis[0], pont_niveis[1], pont_niveis[2], pont_niveis[3], pont_niveis[4], pont_niveis[5]))
         
