@@ -7,7 +7,7 @@ st.set_option('client.caching', False)
 import streamlit.components.v1 as components
 from alunos import mostrar_alunos
 from professores import mostrar_professores
-from mentoria import mostrar_mentoria
+from mentoria_antes import mostrar_mentoria
 from logs import escrever_planilha
 import datetime
 import pytz
@@ -216,7 +216,7 @@ def mostrar_botoes(permissao, nome, email):
     #
     #        mostrar_mentoria(nome, permissao, email)
 
-    elif (permissao == 'Aluno' or permissao == 'Mentor'):
+    elif (permissao == 'Aluno' or permissao == 'Mentor' or permissao == 'Responsável' or permissao == 'Inscrito Simulado Nacional'):
 
         container = st.container()
         with container:
@@ -251,6 +251,10 @@ from tela_login import mostrar_tela_login
 if __name__ == "__main__":
     
     login, permissao, nome, email = mostrar_tela_login()
+    st.write(login)
+    st.write(permissao)
+    st.write(nome)
+    st.write(email)
     if login:
         mostrar_botoes(permissao, nome, email)
         if get_estado()['pagina_atual'] == 'Página Inicial':
