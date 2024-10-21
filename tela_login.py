@@ -63,7 +63,7 @@ def mostrar_formulario_login():
     entrar_button = col5.button('Entrar', key='b20')
     ChangeButtonColour('Entrar', 'white', '#9E089E')
 
-    tabela_usuarios = ler_planilha2("1YxmzHU3AWA_SVoRDX7n8AQmLMravj093Wtzsuvkuo3M", "Lista de usuários | Streamlit | Tabela permissões!A1:D100")
+    tabela_usuarios = ler_planilha2("1YxmzHU3AWA_SVoRDX7n8AQmLMravj093Wtzsuvkuo3M", "Lista de usuários | Streamlit | Tabela permissões!A1:E1000")
 
     lista_emails = tabela_usuarios["Email"].tolist()
 
@@ -78,7 +78,11 @@ def mostrar_formulario_login():
             if senha == senha_correspondente:
                 st.session_state.logged_in = True
                 st.success("Login bem-sucedido! Você pode acessar seu conteúdo aqui.")
-                return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Nome"], tabela_usuarios.loc[indice_email, "Email"]
+
+                if tabela_usuarios.loc[indice_email, "Permissão"] != 'Responsável':
+                    return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Nome"], tabela_usuarios.loc[indice_email, "Email"]
+                else:
+                    return True, tabela_usuarios.loc[indice_email, "Permissão"], tabela_usuarios.loc[indice_email, "Aluno (responsável)"], tabela_usuarios.loc[indice_email, "Email"]
             else:
                 st.error("Senha incorreta. Tente novamente.")
                 return False, "Sem Permissão", "Sem Nome", "Sem Email"
