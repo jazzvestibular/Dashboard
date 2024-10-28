@@ -2648,7 +2648,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
             st.write('')
             st.write('')
 
-            if permissao == 'Aluno':
+            if (permissao == 'Aluno' or permissao == 'Inscrito Simulado Nacional'):
 
                 st.warning("🚨 **Atenção!** 🚨\n\nVocê ainda não realizou esse simulado de 1ª fase ainda! Caso já tenha sido feito, é importante entrar em contato com o Padre o mais rápido possível.")
 
