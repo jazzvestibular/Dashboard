@@ -1554,7 +1554,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
                 resultado_2fase_debate2['Nota'] = resultado_2fase_debate2['Nota'].astype(int)
                 resultado_2fase_debate3 = int(round(250 * resultado_2fase_debate2['Nota'].mean(), 0))
 
-                resultado_2fase_debate4 = resultado_2fase_debate2.groupby(['Nome','Estratégia']).mean().reset_index()
+                resultado_2fase_debate4 = resultado_2fase_debate2.groupby(['Nome','Estratégia']).mean('Nota').reset_index()
                 resultado_2fase_debate4 = resultado_2fase_debate4.sort_values(by='Nota', ascending=False)
                 resultado_2fase_debate4['Classificação'] = resultado_2fase_debate4['Nota'].rank(ascending=False, method='min').astype(int)
 
