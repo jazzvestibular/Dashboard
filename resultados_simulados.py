@@ -2658,7 +2658,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
             else:
 
-                st.warning("🚨 **Atenção!** 🚨\n\nEnvie uma mensagem para Alexandre para você poder fazer o simulado de 1ª fase Insper")                                
+                st.warning("🚨 **Atenção!** 🚨\n\nEnvie uma mensagem para Alexandre para você poder fazer o simulado de 1ª fase Insper!")                                
 
 
             
