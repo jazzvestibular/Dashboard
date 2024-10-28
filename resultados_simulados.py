@@ -2648,11 +2648,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
             st.write('')
             st.write('')
 
-            if (permissao == 'Aluno' or permissao == 'Inscrito Simulado Nacional'):
+            if permissao == 'Aluno':
 
                 st.warning("🚨 **Atenção!** 🚨\n\nVocê ainda não realizou esse simulado de 1ª fase ainda! Caso já tenha sido feito, é importante entrar em contato com o Padre o mais rápido possível.")
 
-            else:
+            elif (permissao == 'Mentor' or permissao == 'Administrador'):
 
                 st.warning("🚨 **Atenção!** 🚨\n\nO(A) aluno(a) ainda não realizou esse simulado de 1ª fase!")                
 
