@@ -2654,7 +2654,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
             elif (permissao == 'Mentor' or permissao == 'Administrador'):
 
-                st.warning("🚨 **Atenção!** 🚨\n\nO(A) aluno(a) ainda não realizou esse simulado de 1ª fase!")                
+                st.warning("🚨 **Atenção!** 🚨\n\nO(A) aluno(a) ainda não realizou esse simulado de 1ª fase!")   
+
+            else:
+
+                st.warning("🚨 **Atenção!** 🚨\n\nEnvie uma mensagem para Alexandre para você poder fazer o simulado de 1ª fase Insper")                                
 
 
             
