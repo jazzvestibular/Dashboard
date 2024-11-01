@@ -1158,7 +1158,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     if permissao != 'Inscrito Simulado Nacional':
 
-        simulados = ["Escolha o simulado"] + ['Simulado Insper 01'] + ['Simulado Insper 02'] + ['Simulado Insper 03'] + ['Simulado Insper 04'] + ['Simulado Insper 05'] + ['Simulado FGV 01'] + ['Simulado FGV 02'] + ['Simulado FGV 03'] + ['Simulado FGV 04'] + ['Simulado FGV 05'] + ['Simulado Matemática Básica']
+        simulados = ["Escolha o simulado"] + ['Simulado Insper 01'] + ['Simulado Insper 02'] + ['Simulado Insper 03'] + ['Simulado Insper 04'] + ['Simulado Insper 05'] + ['Simulado FGV 01'] + ['Simulado FGV 02'] + ['Simulado FGV 03'] + ['Simulado FGV 04'] + ['Simulado FGV 05'] + ['Simulado FGV 06'] + ['Simulado Matemática Básica']
 
         simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
 
@@ -1213,6 +1213,10 @@ def mostrar_resultados_simulados(nome, permissao, email):
         elif simulado_selecionado == 'Simulado FGV 05':
 
             base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 05!A1:L4000")
+
+        elif simulado_selecionado == 'Simulado FGV 06':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 06!A1:L4000")
 
         elif simulado_selecionado == 'Simulado Matemática Básica':
 
