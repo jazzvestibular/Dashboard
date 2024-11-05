@@ -1158,7 +1158,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
     if permissao != 'Inscrito Simulado Nacional':
 
-        simulados = ["Escolha o simulado"] + ['Simulado Insper 01'] + ['Simulado Insper 02'] + ['Simulado Insper 03'] + ['Simulado Insper 04'] + ['Simulado Insper 05'] + ['Simulado FGV 01'] + ['Simulado FGV 02'] + ['Simulado FGV 03'] + ['Simulado FGV 04'] + ['Simulado FGV 05'] + ['Simulado FGV 06'] + ['Simulado Matemática Básica']
+        simulados = ["Escolha o simulado"] + ['Simulado Insper 01'] + ['Simulado Insper 02'] + ['Simulado Insper 03'] + ['Simulado Insper 04'] + ['Simulado Insper 05'] + ['Simulado Insper 06'] + ['Simulado FGV 01'] + ['Simulado FGV 02'] + ['Simulado FGV 03'] + ['Simulado FGV 04'] + ['Simulado FGV 05'] + ['Simulado FGV 06'] + ['Simulado Matemática Básica']
 
         simulado_selecionado = st.selectbox('Selecione o simulado:', simulados)
 
@@ -1193,6 +1193,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
             base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 05!A1:L22000")
             base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")
+
+        elif simulado_selecionado == 'Simulado Insper 06':
+
+            base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 06!A1:L4000")
+            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 06!A1:J4000")
 
         elif simulado_selecionado == 'Simulado FGV 01':
 
@@ -1487,7 +1492,9 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         base.rename(columns = {'atividade_nome':'Nome da avaliação','turma':'Turma','aluno_nome':'Nome do aluno(a)','aluno_login':'Login do aluno(a)','num_exercicio':'Número da questão','certo_ou_errado':'Certo ou errado','valor_do_exercicio':'Valor da questão','frente':'Frente'}, inplace = True)
 
-        base['Valor da questão'] = base['Valor da questão'].apply(lambda x: float(str(x).replace(".", "").replace(",", ".")))
+        #base['Valor da questão'] = base['Valor da questão'].apply(lambda x: float(str(x).replace(".", "").replace(",", ".")))
+
+        base['Valor da questão'] = base['Valor da questão'].apply(lambda x: float(str(x).replace(".", "").replace(",", ".")) if pd.notnull(x) and str(x).replace(".", "").replace(",", "").isdigit() else np.nan)
 
         base['Acerto'] = 0.00
         base['Nota na questão'] = 0.00
