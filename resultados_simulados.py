@@ -1379,13 +1379,13 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         if simulado_selecionado2 == 'Simulado Nacional FGV':
 
-            simulado_selecionado == 'Simulado FGV 06'
+            simulado_selecionado = 'Simulado FGV 06'
 
             base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | FGV 06!A1:L22000")
 
         elif simulado_selecionado2 == 'Simulado Nacional Insper':
 
-            simulado_selecionado == 'Simulado Insper 05'
+            simulado_selecionado = 'Simulado Insper 05'
 
             base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 05!A1:L24000")
             base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")  
