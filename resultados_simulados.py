@@ -1499,7 +1499,14 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         '''
     else:
-        st.warning('Por favor, preencha selecione o(a) aluno(a) e o simulado para continuar.')
+
+        if permissao != 'Inscrito Simulado Nacional':
+
+            st.warning('Por favor, selecione o(a) aluno(a) e o simulado para continuar.')
+        
+        else:
+
+            st.warning('Por favor, selecione o simulado para continuar.')
 
     if (nome_selecionado != 'Escolha o(a) aluno(a)' and simulado_selecionado != 'Escolha o simulado'):
 
