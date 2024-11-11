@@ -1392,7 +1392,7 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         else:
 
-            simulado_selecionado == 'Escolha o simulado'  
+            simulado_selecionado = 'Escolha o simulado'  
 
         #base_matriz_insper5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 05!A1:G1000")
 
