@@ -8,3 +8,4 @@ oauth2client==4.1.3
 google-api-python-client
 tqdm
 protobuf==3.20.*
+altair==4.1.*
