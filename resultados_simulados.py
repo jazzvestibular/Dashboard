@@ -1443,10 +1443,6 @@ def mostrar_resultados_simulados(nome, permissao, email):
 
         #login_aluno = st.text_input('Digite o seu login', '')
 
-    base_resultados_simu_selecionado = base_resultados.copy()
-
-    #base_resultados_simu_selecionado = base_resultados[base_resultados['Simulado'] == simulado_selecionado]
-    base_resultados_simu_selecionado = base_resultados_simu_selecionado[base_resultados_simu_selecionado['num_exercicio'] != "73"].reset_index(drop = True) 
 
     if (nome_selecionado == 'Escolha o(a) aluno(a)' or simulado_selecionado == 'Escolha o simulado'):
 
@@ -1454,6 +1450,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
         percentage_text.text("40%")
 
     if (nome_selecionado != 'Escolha o(a) aluno(a)' and simulado_selecionado != 'Escolha o simulado'):
+
+        base_resultados_simu_selecionado = base_resultados.copy()
+
+        #base_resultados_simu_selecionado = base_resultados[base_resultados['Simulado'] == simulado_selecionado]
+        base_resultados_simu_selecionado = base_resultados_simu_selecionado[base_resultados_simu_selecionado['num_exercicio'] != "73"].reset_index(drop = True) 
 
         auxiliar_aluno = base_resultados_simu_selecionado[base_resultados_simu_selecionado['aluno_nome'] == nome_selecionado].reset_index(drop = True)  
 
