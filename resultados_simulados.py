@@ -1388,7 +1388,11 @@ def mostrar_resultados_simulados(nome, permissao, email):
             simulado_selecionado == 'Simulado Insper 05'
 
             base_resultados = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "RelSimulado | Insper 05!A1:L24000")
-            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")    
+            base_redacao = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Red | Insper 05!A1:J22000")  
+
+        else:
+
+            simulado_selecionado == 'Escolha o simulado'  
 
         #base_matriz_insper5 = ler_planilha("1iLxsOaDPsyraduRGj_kZWmuEMRqo5VSGURKWuXD40M8", "Matriz | Insper 05!A1:G1000")
 
